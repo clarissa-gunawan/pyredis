@@ -7,7 +7,7 @@ Spec: https://redis.io/docs/latest/develop/reference/protocol-spec/
 - For **Errors** the first byte of the reply is "-"             "-Error message\r\n"
 - For **Integers** the first byte of the reply is ":"           ":[<+|->]<value>\r\n"
 - For **Bulk Strings** the first byte of the reply is "$"       "$<length>\r\n<data>\r\n"
-- For **Arrays** the first byte of the reply is "``"            "*<number-of-elements>\r\n<element-1>...<element-n>"
+- For **Arrays** the first byte of the reply is "*"            "*<number-of-elements>\r\n<element-1>...<element-n>"
 
 We need a module that extracts messages from the stream.
 When we read from the network we will get:
@@ -48,7 +48,19 @@ import pytest
     (b"$11\r\nBulk String\r\n", (BulkString("Bulk String"), 18)),
     (b"$8\r\nBulk Str\r\n+OK", (BulkString("Bulk Str"), 14)),
 
-    # Array 
+    # Array with Simple String
+    (b"*1\r\n+OK", (None, 0)),
+    (b"*1\r\n+OK\r\n", (Array([SimpleString("OK")]), 9)),
+    (b"*2\r\n+Hello\r\n+World\r\n", (Array([SimpleString("Hello"), SimpleString("World")]), 20)),
+    (b"*2\r\n+Hello\r\n+World\r\n:Test", (Array([SimpleString("Hello"), SimpleString("World")]), 20)),
+
+    # Array with Error
+    (b"*1\r\n-Err", (None, 0)),
+    (b"*1\r\n-Error Message 1\r\n", (Array([Error("Error Message 1")]), 22)),
+    (b"*2\r\n-Error Message 1\r\n-Error Message 2\r\n", (Array([Error("Error Message 1"), Error("Error Message 2")]), 40)),
+    (b"*2\r\n-Error Message 1\r\n-Error Message 2\r\n-Err", (Array([Error("Error Message 1"), Error("Error Message 2")]), 40)),
+
+    # Array with Integers
     (b"*1\r\n:10", (None, 0)),
     (b"*1\r\n:300\r\n", (Array([Integer(300)]), 10)),
     (b"*2\r\n:300\r\n:400\r\n", (Array([Integer(300), Integer(400)]), 16)),
