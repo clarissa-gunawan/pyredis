@@ -88,13 +88,15 @@ def test_parse_frame(buffer, expected):
 
 @pytest.mark.parametrize("input, expected", [
     (SimpleString("OK"), b"+OK\r\n"),
-    
+    (Error("Error Message"), b"-Error Message\r\n"),
+    (Integer(100), b":100\r\n"),
+    (BulkString("Bulk String"), b"$11\r\nBulk String\r\n"),
+    (BulkString(None), b"$-1\r\n"),
+    (BulkString(""), b"$0\r\n\r\n"),
+    (Array([]), b"*0\r\n"),
+    (Array(None), b"*-1\r\n"),
+    (Array([Integer(1),Integer(2)]), b"*2\r\n:1\r\n:2\r\n"),
 ])
 def test_serialize(input, expected):
     got = input.serialize()
-    got == expected
-
-
-
-if __name__ == "__main__":
-    sys.exit(pytest.main(["--capture=no", "-v"]))
+    assert got == expected

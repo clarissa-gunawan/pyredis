@@ -9,33 +9,47 @@ class SimpleString:
     data: str
 
     def serialize(self):
-        return b"+" + self.data.encode() + DELIMITER
+        return f"+{self.data}\r\n".encode()
         
 
 @dataclass
 class Error:
-    message: str
+    data: str
 
     def serialize(self):
-        return b"-" + self.message.encode() + DELIMITER
+        return f"-{self.data}\r\n".encode()
 
 @dataclass
 class Integer:
     data: int
 
     def serialize(self):
-        return b":" + self.data.encode() + DELIMITER
+        return f":{self.data}\r\n".encode()
 
 @dataclass
 class BulkString:
     data: str
 
     def serialize(self):
-        return b"$" + self.data.encode() + DELIMITER
+        if self.data is None:
+            return b"$-1\r\n"
+        
+        return f"${len(self.data)}\r\n{self.data}\r\n".encode()
 
 @dataclass
 class Array:
     data: List
+
+    def serialize(self):
+        if self.data is None:
+            return b"*-1\r\n"
+        
+        output = f"*{len(self.data)}\r\n".encode()
+
+        for d in self.data:
+            output += d.serialize()
+        
+        return output
 
 
 
