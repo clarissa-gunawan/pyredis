@@ -1,5 +1,5 @@
 
-from protocol import parse_frame
+from protocol import parse_frame, SimpleString
 
 '''
 
@@ -30,7 +30,7 @@ def test_parse_frame():
 def test_parse_frame_full():
     buffer = b"+OK\r\n"
     msg, size = parse_frame(buffer)
-    assert msg == "OK"
+    assert msg == SimpleString("OK")
     assert size == 5
 
 
