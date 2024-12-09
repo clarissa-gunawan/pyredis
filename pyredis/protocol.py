@@ -50,16 +50,13 @@ def parse_frame(buffer):
         case "*":
             expected_count = int(buffer[1: end].decode('ascii'))
             actual_count = buffer[end + DELIMITER_SIZE:].count(DELIMITER)
-            print(f"Expected Count: {expected_count}, Actual Count: {actual_count}")
 
             if actual_count >= expected_count:
                 current_arr = []
                 current_size = end + DELIMITER_SIZE
                 for _ in range(expected_count):
                     new_input = buffer[current_size:]
-                    print(f"New Input: {new_input}")
                     value, size = parse_frame(new_input)
-                    print(f"Value: {value}, Size: {size}")
                     current_arr.append(value)
                     current_size += size
 
