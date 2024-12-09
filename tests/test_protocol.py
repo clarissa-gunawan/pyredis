@@ -1,6 +1,3 @@
-
-from protocol import parse_frame, SimpleString
-
 '''
 
 RESP (Redis Serialization Protocol)
@@ -20,19 +17,26 @@ When we read from the network we will get:
 We will need to remove parsed bytes from the stream.
 '''
 
-def test_parse_frame():
-    buffer = b"+OK"
-    msg, size = parse_frame(buffer)
-    assert msg == None
-    assert size == 0
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
-def test_parse_frame_full():
-    buffer = b"+OK\r\n"
-    msg, size = parse_frame(buffer)
-    assert msg == SimpleString("OK")
-    assert size == 5
+from pyredis.protocol import parse_frame, SimpleString
+
+import pytest
+
+@pytest.mark.parametrize("buffer, expected", [
+    # Simple String
+    (b"+OK", (None, 0)),
+    (b"+OK\r\n", (SimpleString("OK"), 5)),
+    (b"+OK\r\n+Partial", (SimpleString("OK"), 5)),
+])
+def test_parse_frame(buffer, expected):
+    got = parse_frame(buffer)
+    assert got[0] == expected[0]
+    assert got[1] == expected[1]
 
 
-test_parse_frame()
-test_parse_frame_full()
+if __name__ == "__main__":
+    sys.exit(pytest.main())
