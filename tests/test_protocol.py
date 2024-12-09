@@ -22,7 +22,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
-from pyredis.protocol import parse_frame, SimpleString
+from pyredis.protocol import parse_frame, SimpleString, Error, Integer, BulkString, Array
 
 import pytest
 
@@ -31,7 +31,25 @@ import pytest
     (b"+OK", (None, 0)),
     (b"+OK\r\n", (SimpleString("OK"), 5)),
     (b"+OK\r\n+Partial", (SimpleString("OK"), 5)),
+    (b"+OK\r\n+Second Message\r\n", (SimpleString("OK"), 5)),
+
+    # Error
+    (b"-Err", (None, 0)),
+    (b"-Error Message\r\n", (Error("Error Message"), 16)),
+    (b"-Error Message\r\n+Partial", (Error("Error Message"), 16)),
+
+    # Integer
+    (b":1", (None, 0)),
+    (b":100\r\n", (Integer(100), 6)),
+    (b":100\r\n:200", (Integer(100), 6)),
+
+    # Bulk String
+    (b"$8\r\nPartial", (None, 0)),
+    (b"$11\r\nBulk String\r\n", (BulkString("Bulk String"), 18)),
+    (b"$8\r\nBulk Str\r\n+OK", (BulkString("Bulk Str"), 14)),
+
 ])
+
 def test_parse_frame(buffer, expected):
     got = parse_frame(buffer)
     assert got[0] == expected[0]
