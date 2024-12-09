@@ -66,6 +66,12 @@ import pytest
     (b"*2\r\n:300\r\n:400\r\n", (Array([Integer(300), Integer(400)]), 16)),
     (b"*2\r\n:300\r\n:400\r\n:50", (Array([Integer(300), Integer(400)]), 16)),
 
+
+    # Array with Bulk String
+    (b"*1\r\n$8\r\nPartial", (None, 0)),
+    (b"*1\r\n$11\r\nBulk String\r\n", (Array([BulkString("Bulk String")]), 22)),
+    (b"*2\r\n$11\r\nBulk String\r\n$11\r\nHello World\r\n", (Array([BulkString("Bulk String"), BulkString("Hello World")]), 40)),
+    (b"*2\r\n$11\r\nBulk String\r\n$11\r\nHello World\r\n*1", (Array([BulkString("Bulk String"), BulkString("Hello World")]), 40)),
 ])
 
 def test_parse_frame(buffer, expected):

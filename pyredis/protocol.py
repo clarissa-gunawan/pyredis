@@ -57,6 +57,8 @@ def parse_frame(buffer):
                 for _ in range(expected_count):
                     new_input = buffer[current_size:]
                     value, size = parse_frame(new_input)
+                    if size == 0:
+                        return None, 0
                     current_arr.append(value)
                     current_size += size
 
