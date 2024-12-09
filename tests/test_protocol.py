@@ -48,6 +48,12 @@ import pytest
     (b"$11\r\nBulk String\r\n", (BulkString("Bulk String"), 18)),
     (b"$8\r\nBulk Str\r\n+OK", (BulkString("Bulk Str"), 14)),
 
+    # Array 
+    (b"*1\r\n:10", (None, 0)),
+    (b"*1\r\n:300\r\n", (Array([Integer(300)]), 10)),
+    (b"*2\r\n:300\r\n:400\r\n", (Array([Integer(300), Integer(400)]), 16)),
+    (b"*2\r\n:300\r\n:400\r\n:50", (Array([Integer(300), Integer(400)]), 16)),
+
 ])
 
 def test_parse_frame(buffer, expected):
@@ -57,4 +63,4 @@ def test_parse_frame(buffer, expected):
 
 
 if __name__ == "__main__":
-    sys.exit(pytest.main())
+    sys.exit(pytest.main(["--capture=no", "-v"]))
