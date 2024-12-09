@@ -1,28 +1,43 @@
 from dataclasses import dataclass
 from typing import List
 
+DELIMITER = b"\r\n"
+DELIMITER_SIZE = 2
+
 @dataclass
 class SimpleString:
     data: str
+
+    def serialize(self):
+        return b"+" + self.data.encode() + DELIMITER
+        
 
 @dataclass
 class Error:
     message: str
 
+    def serialize(self):
+        return b"-" + self.message.encode() + DELIMITER
+
 @dataclass
 class Integer:
     data: int
+
+    def serialize(self):
+        return b":" + self.data.encode() + DELIMITER
 
 @dataclass
 class BulkString:
     data: str
 
+    def serialize(self):
+        return b"$" + self.data.encode() + DELIMITER
+
 @dataclass
 class Array:
     data: List
 
-DELIMITER = b"\r\n"
-DELIMITER_SIZE = 2
+
 
 def parse_frame(buffer):
     end = buffer.find(DELIMITER)
@@ -49,19 +64,18 @@ def parse_frame(buffer):
             
         case "*":
             expected_count = int(buffer[1: end].decode('ascii'))
-            actual_count = buffer[end + DELIMITER_SIZE:].count(DELIMITER)
+            if expected_count == 0:
+                return Array([]), 0
+            current_arr = []
+            current_size = end + DELIMITER_SIZE
+            for _ in range(expected_count):
+                new_input = buffer[current_size:]
+                value, size = parse_frame(new_input)
+                if size == 0:
+                    return None, 0
+                current_arr.append(value)
+                current_size += size
 
-            if actual_count >= expected_count:
-                current_arr = []
-                current_size = end + DELIMITER_SIZE
-                for _ in range(expected_count):
-                    new_input = buffer[current_size:]
-                    value, size = parse_frame(new_input)
-                    if size == 0:
-                        return None, 0
-                    current_arr.append(value)
-                    current_size += size
-
-                return Array(current_arr), current_size              
+            return Array(current_arr), current_size              
     
     return None, 0

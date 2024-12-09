@@ -8,6 +8,8 @@ Spec: https://redis.io/docs/latest/develop/reference/protocol-spec/
 - For **Integers** the first byte of the reply is ":"           ":[<+|->]<value>\r\n"
 - For **Bulk Strings** the first byte of the reply is "$"       "$<length>\r\n<data>\r\n"
 - For **Arrays** the first byte of the reply is "*"            "*<number-of-elements>\r\n<element-1>...<element-n>"
+- For Nulls "-"
+- For Empty Array 
 
 We need a module that extracts messages from the stream.
 When we read from the network we will get:
@@ -48,6 +50,10 @@ import pytest
     (b"$11\r\nBulk String\r\n", (BulkString("Bulk String"), 18)),
     (b"$8\r\nBulk Str\r\n+OK", (BulkString("Bulk Str"), 14)),
 
+    # Array
+    (b"*", (None, 0)),
+    (b"*0\r\n", (Array([]), 0)),
+
     # Array with Simple String
     (b"*1\r\n+OK", (None, 0)),
     (b"*1\r\n+OK\r\n", (Array([SimpleString("OK")]), 9)),
@@ -72,12 +78,22 @@ import pytest
     (b"*1\r\n$11\r\nBulk String\r\n", (Array([BulkString("Bulk String")]), 22)),
     (b"*2\r\n$11\r\nBulk String\r\n$11\r\nHello World\r\n", (Array([BulkString("Bulk String"), BulkString("Hello World")]), 40)),
     (b"*2\r\n$11\r\nBulk String\r\n$11\r\nHello World\r\n*1", (Array([BulkString("Bulk String"), BulkString("Hello World")]), 40)),
-])
 
+])
 def test_parse_frame(buffer, expected):
     got = parse_frame(buffer)
     assert got[0] == expected[0]
     assert got[1] == expected[1]
+
+
+@pytest.mark.parametrize("input, expected", [
+    (SimpleString("OK"), b"+OK\r\n"),
+    
+])
+def test_serialize(input, expected):
+    got = input.serialize()
+    got == expected
+
 
 
 if __name__ == "__main__":
