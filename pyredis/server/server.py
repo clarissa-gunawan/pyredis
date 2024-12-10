@@ -1,5 +1,5 @@
 import socket
-from commands import parse_command
+from pyredis.commands import parse_command
 
 # This is a Well Known Port assigned for Echo Protocol
 # https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers#Well-known_ports
@@ -16,11 +16,16 @@ def handle_connection(client_socket):
         try:
             message = client_socket.recv(BUFFER_SIZE)
 
-            if message:
-                parse_command(message)
+            if not message:
+                break
+
+            parse_command(message)
+            
         except ConnectionResetError:
             print("Client disconnected")
             return
+        finally:
+            client_socket.close()
 
 
 def server():
@@ -28,6 +33,7 @@ def server():
     # and SOCK_STREAM (TCP)
     print("Initializing Server")
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # Reuse address
         server_socket.bind((HOST, PORT))
         server_socket.listen()
 
