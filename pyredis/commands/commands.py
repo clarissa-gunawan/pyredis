@@ -10,6 +10,9 @@ def parse_command(buffer):
     print(f"BUFFER: {buffer}")
     value, size = parse_frame(buffer)
     print(f"PARSED BUFFER: {value}")
+    if value is None:
+        return None, 0
+    
     try:
         
         match value.data[0]:

@@ -33,4 +33,5 @@ Example Commands on Ubuntu
 ```
 echo -e '*1\r\n$4\r\nPING\r\n' | nc localhost 7
 echo -e '*2\r\n$4\r\nECHO\r\n$11\r\nHello World\r\n' | nc localhost 7
+echo -e '*1\r\n$4\r\nPING\r\n*1\r\n$4\r\nPING\r\n' | nc localhost 7
 ```
