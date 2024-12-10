@@ -13,11 +13,11 @@ from pyredis.commands import parse_command
         "buffer, expected",
         [
             # Ping Command
-            (b"*1\r\n+PING\r\n", b"*1\r\n+PONG\r\n"),
-            (b"*2\r\n+PING\r\n$11\r\nHello World\r\n", b"*1\r\n$11\r\nHello World\r\n"),
+            (b"*1\r\n$4\r\nPING\r\n", (b"+PONG\r\n", 14)),
+            (b"*2\r\n$4\r\nPING\r\n$11\r\nHello World\r\n", (b"$11\r\nHello World\r\n", 32)),
             # Echo Command
-            (b"*1\r\n+ECHO\r\n", b"*0\r\n"),
-            (b"*2\r\n+ECHO\r\n$11\r\nHello World\r\n", b"*1\r\n$11\r\nHello World\r\n"),
+            (b"*1\r\n$4\r\nECHO\r\n", (b"$0\r\n\r\n", 14)),
+            (b"*2\r\n$4\r\nECHO\r\n$11\r\nHello World\r\n", (b"$11\r\nHello World\r\n", 32)),
         ]
 )
 def test_parse_command(buffer, expected):
