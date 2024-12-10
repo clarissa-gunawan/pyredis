@@ -48,6 +48,7 @@ import pytest
         (b":100\r\n", (Integer(100), 6)),
         (b":100\r\n:200", (Integer(100), 6)),
         # Bulk String
+        (b"$0\r\n\r\n", (BulkString(""), 6)),
         (b"$8\r\nPartial", (None, 0)),
         (b"$11\r\nBulk String\r\n", (BulkString("Bulk String"), 18)),
         (b"$8\r\nBulk Str\r\n+OK", (BulkString("Bulk Str"), 14)),
