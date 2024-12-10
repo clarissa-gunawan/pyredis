@@ -21,7 +21,7 @@ def parse_command(buffer):
             case BulkString("ECHO"):
                 return echo_command(value), size
             case _:
-                return Error("Not a valid command").serialize(), size
+                return Error("Error: Not a valid command").serialize(), size
     except Exception as e:
         return Error(e).serialize(), size
         
