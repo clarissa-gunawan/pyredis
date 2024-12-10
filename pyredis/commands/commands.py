@@ -7,11 +7,11 @@ Clients send commands to a Redis server as an array of bulk strings. The first (
 The server replies with a RESP type. The reply's type is determined by the command's implementation and possibly by the client's protocol version.
 """
 def parse_command(buffer):
-    print(buffer)
+    print(f"BUFFER: {buffer}")
     value, size = parse_frame(buffer)
-    print(value)
-
+    print(f"PARSED BUFFER: {value}")
     try:
+        
         match value.data[0]:
             case BulkString("PING"):
                 return ping_command(value), size
@@ -19,10 +19,8 @@ def parse_command(buffer):
                 return echo_command(value), size
             case _:
                 return Error("Not a valid command").serialize(), size
-    except Exception(e) as e:
+    except Exception as e:
         return Error(e).serialize(), size
-    
-    return None, 0
         
 
 def ping_command(input):

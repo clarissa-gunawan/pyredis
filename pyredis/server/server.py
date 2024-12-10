@@ -12,14 +12,18 @@ BUFFER_SIZE = 4096
 
 
 def handle_connection(client_socket):
+    remaining_message = b""
     while True:
         try:
             message = client_socket.recv(BUFFER_SIZE)
 
             if not message:
                 break
-
-            parse_command(message)
+        
+            message = remaining_message + message
+            value, size = parse_command(message)
+            client_socket.send(value)
+            remaining_message = message[size:]
             
         except ConnectionResetError:
             print("Client disconnected")
