@@ -19,12 +19,6 @@ When we read from the network we will get:
 We will need to remove parsed bytes from the stream.
 """
 
-# import sys
-# import os
-
-# sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-
 from pyredis.protocol import (
     parse_frame,
     SimpleString,
