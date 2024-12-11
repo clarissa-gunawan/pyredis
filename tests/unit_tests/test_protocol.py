@@ -24,6 +24,7 @@ from pyredis.protocol import (
     Integer,
     BulkString,
     Array,
+    Null,
 )
 
 import pytest
@@ -111,6 +112,7 @@ def test_parse_frame(buffer, expected):
         (Array([]), b"*0\r\n"),
         (Array(None), b"*-1\r\n"),
         (Array([Integer(1), Integer(2)]), b"*2\r\n:1\r\n:2\r\n"),
+        (Null(), b"_\r\n")
     ],
 )
 def test_serialize(input, expected):

@@ -4,6 +4,11 @@ from typing import List
 DELIMITER = b"\r\n"
 DELIMITER_SIZE = 2
 
+@dataclass
+class Null:
+
+    def serialize(self):
+        return "_\r\n".encode()
 
 @dataclass
 class SimpleString:
