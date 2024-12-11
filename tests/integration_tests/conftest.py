@@ -12,6 +12,7 @@ def async_server(scope="module"):
     time.sleep(0.1)  # 100ms
     yield
 
+
 @pytest.fixture
 def threaded_server(scope="module"):
     threading.Thread(target=pyredis.main, kwargs={"threaded": True}, daemon=True).start()
