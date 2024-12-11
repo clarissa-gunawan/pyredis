@@ -1,15 +1,16 @@
 import asyncio
 from pyredis.server.threaded_server import threaded_server
 from pyredis.server.async_server import PyRedisAsyncServerProtocol
+from pyredis.datastore import DataStore
 
 DEFAULT_HOST = "localhost"
 DEFAULT_PORT = 6380
 
 
-async def async_main(host, port):
+async def async_main(host, port, datastore):
     loop = asyncio.get_running_loop()
     instance_of_server = await loop.create_server(
-        lambda: PyRedisAsyncServerProtocol(),
+        lambda: PyRedisAsyncServerProtocol(datastore),
         host,
         port,
     )
@@ -25,13 +26,15 @@ def main(host: str = None, port: int = None, threaded: bool = False):
     else:
         port = int(port)
 
+    print("Initialize DataStore")
+    datastore = DataStore()
     print(f"Start PyRedis on host: {host}, port: {port}")
 
     if threaded:
         print("Run Threaded Server")
-        threaded_server(host, port)
+        threaded_server(host, port, datastore)
     else:
         print("Run Async Server")
-        asyncio.run(async_main(host, port))
+        asyncio.run(async_main(host, port, datastore))
 
     return 0

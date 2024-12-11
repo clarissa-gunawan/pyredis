@@ -11,7 +11,7 @@ from threading import Thread
 BUFFER_SIZE = 4096
 
 
-def handle_connection(client_socket):
+def handle_connection(client_socket, datastore):
     remaining_message = b""
     try:
         while True:
@@ -23,7 +23,7 @@ def handle_connection(client_socket):
             message = remaining_message + message
 
             while True:
-                value, size = parse_command(message)
+                value, size = parse_command(message, datastore)
 
                 if value is None:
                     break
@@ -41,7 +41,7 @@ def handle_connection(client_socket):
         client_socket.close()
 
 
-def threaded_server(host, port):
+def threaded_server(host, port, datastore):
     # the family and type default to AF_INET (Internet Addresses - Hostname or IP address)
     # and SOCK_STREAM (TCP)
     print("Initializing Server")
@@ -55,7 +55,7 @@ def threaded_server(host, port):
             try:
                 client_socket, address = server_socket.accept()
                 print(f"Accepting connection from: {address}")
-                Thread(target=handle_connection, args=(client_socket,), daemon=True).start()
+                Thread(target=handle_connection, args=(client_socket, datastore), daemon=True).start()
             except KeyboardInterrupt:
                 print("Shutting down server")
                 return
