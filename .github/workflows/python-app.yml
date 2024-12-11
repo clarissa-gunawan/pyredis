@@ -13,7 +13,7 @@ jobs:
         run: |
           ruff check .
           ruff format --check
-  unit-test:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,10 +27,10 @@ jobs:
           pip install pytest
           if [ -f requirements-dev.txt]; then pip install -r requirements-dev.txt; fi
           if [ -f requirements.txt]; then pip install -r requirements.txt; fi
-      - name: Test with pytest
+      - name: Unit Test with pytest
         run: |
           python -m pytest tests/unit_tests
-      - name: Test integration tests/unit_tests
+      - name: Integration Test with pytest
         run: |
           sudo apt install -y redis-tools
           python -m pytest tests/integration_tests
