@@ -18,7 +18,7 @@ pytest --capture=no --verbose
 
 ## Run Server
 ```
-python3 -m pyredis.main
+python3 -m pyredis
 ```
 
 ## Run Client on Terminal
