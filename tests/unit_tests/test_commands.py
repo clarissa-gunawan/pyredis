@@ -6,8 +6,7 @@ REDIS Commands
 
 import pytest
 from pyredis.commands import parse_command
-from pyredis.datastore import DataStore
-
+from pyredis.datastore.lock_datastore import LockDataStore
 
 @pytest.mark.parametrize(
     "buffer, expected",
@@ -34,7 +33,7 @@ from pyredis.datastore import DataStore
     ],
 )
 def test_parse_command(buffer, expected):
-    datastore = DataStore()
+    datastore = LockDataStore()
     datastore["key1"] = "value1"
     got = parse_command(buffer, datastore)
     assert got == expected

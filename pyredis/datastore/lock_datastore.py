@@ -1,7 +1,7 @@
 from threading import Lock
 
 
-class DataStore:
+class LockDataStore:
     def __init__(self):
         self._data = dict()
         self._lock = Lock()
