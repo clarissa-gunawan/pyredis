@@ -45,8 +45,9 @@ redis-cli -p 6380 SET message "Hello World"
 redis-cli -p 6380 GET message
 ```
 
-## Lint 
-Use (Ruff)[https://docs.astral.sh/ruff/]
+## Lint & Format
+Use [Ruff](https://docs.astral.sh/ruff/)
+
 Lint
 ```
 ruff check                  # Lint all files in the current directory.
