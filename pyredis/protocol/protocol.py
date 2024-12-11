@@ -6,6 +6,12 @@ DELIMITER_SIZE = 2
 
 
 @dataclass
+class Nil:
+    def serialize(self):
+        return "$-1\r\n".encode()
+
+
+@dataclass
 class SimpleString:
     data: str
 

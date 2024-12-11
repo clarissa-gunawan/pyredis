@@ -3,9 +3,10 @@ from pyredis.commands import parse_command
 
 
 class PyRedisAsyncServerProtocol(asyncio.Protocol):
-    def __init__(self):
+    def __init__(self, datastore):
         self.transport = None
         self.remaining_data = b""
+        self.datastore = datastore
 
     def connection_made(self, transport):
         peername = transport.get_extra_info("peername")
@@ -19,7 +20,7 @@ class PyRedisAsyncServerProtocol(asyncio.Protocol):
         data = data + self.remaining_data
 
         while True:
-            processed_data, size = parse_command(data)
+            processed_data, size = parse_command(data, self.datastore)
 
             if processed_data is None:
                 break

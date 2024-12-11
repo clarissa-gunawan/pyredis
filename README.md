@@ -36,6 +36,15 @@ echo -e '*2\r\n$4\r\nECHO\r\n$11\r\nHello World\r\n' | nc localhost 7
 echo -e '*1\r\n$4\r\nPING\r\n*1\r\n$4\r\nPING\r\n' | nc localhost 7
 ```
 
+## Run Client with redis-cli
+```
+redis-cli -p 6380 PING
+redis-cli -p 6380 PING "Hello World"
+redis-cli -p 6380 ECHO "Hello World"
+redis-cli -p 6380 SET message "Hello World"
+redis-cli -p 6380 GET message
+```
+
 ## Lint 
 Use (Ruff)[https://docs.astral.sh/ruff/]
 Lint
