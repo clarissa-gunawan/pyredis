@@ -1,4 +1,4 @@
-from pyredis.protocol import parse_frame, SimpleString, Array, BulkString, Error
+from pyredis.protocol import parse_frame, SimpleString, BulkString, Error
 
 """
 Redis generally uses RESP as a request-response protocol in the following way:

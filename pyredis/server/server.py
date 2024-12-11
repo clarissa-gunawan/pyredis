@@ -60,7 +60,7 @@ def server():
                 print(f"Accepting connection from: {address}")
                 handle_connection(client_socket)
             except KeyboardInterrupt:
-                print(f"Shutting down server")
+                print("Shutting down server")
                 return
 
 
