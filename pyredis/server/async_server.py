@@ -1,14 +1,15 @@
 import asyncio
 from pyredis.commands import parse_command
 
+
 class PyRedisAsyncServerProtocol(asyncio.Protocol):
     def __init__(self):
         self.transport = None
         self.remaining_data = b""
 
     def connection_made(self, transport):
-        peername = transport.get_extra_info('peername')
-        print('Connection from {}'.format(peername))
+        peername = transport.get_extra_info("peername")
+        print("Connection from {}".format(peername))
         self.transport = transport
 
     def data_received(self, data):
@@ -23,10 +24,10 @@ class PyRedisAsyncServerProtocol(asyncio.Protocol):
             if processed_data is None:
                 break
 
-            print('Send: {!r}'.format(data.decode()))
+            print("Send: {!r}".format(data.decode()))
             self.transport.write(processed_data)
 
             self.remaining_data = data[size:]
             data = self.remaining_data
-        
+
         self.transport.close()

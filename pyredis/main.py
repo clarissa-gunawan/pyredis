@@ -1,10 +1,10 @@
 import asyncio
-from threading import Thread
 from pyredis.server.threaded_server import threaded_server
 from pyredis.server.async_server import PyRedisAsyncServerProtocol
 
 DEFAULT_HOST = "localhost"
 DEFAULT_PORT = 6380
+
 
 async def async_main(host, port):
     loop = asyncio.get_running_loop()
@@ -15,6 +15,7 @@ async def async_main(host, port):
     )
     async with instance_of_server:
         await instance_of_server.serve_forever()
+
 
 def main(host: str = None, port: int = None, threaded: bool = False):
     if host is None:
