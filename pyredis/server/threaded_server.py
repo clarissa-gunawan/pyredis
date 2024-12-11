@@ -44,7 +44,6 @@ def handle_connection(client_socket, datastore):
 def threaded_server(host, port, datastore):
     # the family and type default to AF_INET (Internet Addresses - Hostname or IP address)
     # and SOCK_STREAM (TCP)
-    print("Initializing Server")
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Reuse address
         server_socket.bind((host, port))

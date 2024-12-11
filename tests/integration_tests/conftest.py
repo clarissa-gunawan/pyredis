@@ -6,15 +6,15 @@ import pytest
 import pyredis
 
 
-@pytest.fixture
-def async_server(scope="module"):
+@pytest.fixture(scope="session")
+def async_server():
     threading.Thread(target=pyredis.main, kwargs={"threaded": False}, daemon=True).start()
     time.sleep(0.1)  # 100ms
     yield
 
 
-@pytest.fixture
-def threaded_server(scope="module"):
-    threading.Thread(target=pyredis.main, kwargs={"threaded": True}, daemon=True).start()
+@pytest.fixture(scope="session")
+def threaded_server():
+    threading.Thread(target=pyredis.main, kwargs={"port": 6382, "threaded": True}, daemon=True).start()
     time.sleep(0.1)  # 100ms
     yield
