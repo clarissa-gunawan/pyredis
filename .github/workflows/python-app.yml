@@ -10,7 +10,7 @@ jobs:
       - name: Lint with ruff
         uses: astral-sh/ruff-action@v1
         run: |
-          ruff check --statistics
+          ruff check .
           ruff format --check
   unit-test:
     runs-on: ubuntu-latest
