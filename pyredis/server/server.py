@@ -1,5 +1,7 @@
 import socket
 from pyredis.commands import parse_command
+from threading import Thread
+import asyncio
 
 # This is a Well Known Port assigned for Echo Protocol
 # https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers#Well-known_ports
@@ -56,10 +58,26 @@ def server():
                 client_socket, address = server_socket.accept()
                 print(f"Accepting connection from: {address}")
                 handle_connection(client_socket)
+                # t = Thread(target=handle_connection, args=(client_socket,), daemon=True)
+                # t.start()
             except KeyboardInterrupt:
                 print("Shutting down server")
                 return
 
+async def async_main():
+    loop = asyncio.get_running_loop()
+    instance_of_server = await loop.create_server(
+        lambda: server()
+    )
+    async with instance_of_server:
+        await instance_of_server.serve_forever()
+
 
 if __name__ == "__main__":
-    server()
+    use_async = True
+    if use_async:
+        print("RUN with Async")
+        async_main()
+    else:
+        print("RUN with Threading")
+        Thread(target=server, daemon=True).start()
