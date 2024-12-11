@@ -29,7 +29,7 @@ from pyredis.datastore import DataStore
         (b"*2\r\n$3\r\nSET\r\n$7\r\nmessage\r\n", (b"-ERR wrong number of arguments for 'set' command\r\n", 26)),
         # Get Command
         (b"*2\r\n$3\r\nGET\r\n$4\r\nkey1\r\n", (b"$6\r\nvalue1\r\n", 23)),
-        (b"*2\r\n$3\r\nGET\r\n$4\r\nkey2\r\n", (b"_\r\n", 23)),
+        (b"*2\r\n$3\r\nGET\r\n$4\r\nkey2\r\n", (b"$-1\r\n", 23)),
         (b"*3\r\n$3\r\nGET\r\n$7\r\nmessage\r\n$3\r\ntry\r\n", (b"-ERR wrong number of arguments for 'get' command\r\n", 35)),
     ],
 )

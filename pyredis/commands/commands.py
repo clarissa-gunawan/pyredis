@@ -1,4 +1,4 @@
-from pyredis.protocol import parse_frame, SimpleString, BulkString, Error, Null
+from pyredis.protocol import parse_frame, SimpleString, BulkString, Error, Nil
 
 """
 Redis generally uses RESP as a request-response protocol in the following way:
@@ -75,4 +75,4 @@ def get_command(input, datastore):
         value = datastore[key]
         return BulkString(value).serialize()
     except Exception:
-        return Null().serialize()
+        return Nil().serialize()

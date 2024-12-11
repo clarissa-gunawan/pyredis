@@ -6,9 +6,9 @@ DELIMITER_SIZE = 2
 
 
 @dataclass
-class Null:
+class Nil:
     def serialize(self):
-        return "_\r\n".encode()
+        return "$-1\r\n".encode()
 
 
 @dataclass
