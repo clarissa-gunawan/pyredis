@@ -30,4 +30,7 @@ jobs:
       - name: Test with pytest
         run: |
           python -m pytest tests/unit_tests
-  
+      - name: Test integration tests/unit_tests
+        run: |
+          apt install redis-tools
+          python -m pytest tests/integration_tests
