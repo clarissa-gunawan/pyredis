@@ -35,3 +35,18 @@ echo -e '*1\r\n$4\r\nPING\r\n' | nc localhost 7
 echo -e '*2\r\n$4\r\nECHO\r\n$11\r\nHello World\r\n' | nc localhost 7
 echo -e '*1\r\n$4\r\nPING\r\n*1\r\n$4\r\nPING\r\n' | nc localhost 7
 ```
+
+## Lint 
+Use (Ruff)[https://docs.astral.sh/ruff/]
+Lint
+```
+ruff check                  # Lint all files in the current directory.
+ruff check --fix            # Lint all files in the current directory, and fix any fixable errors.
+```
+
+Format
+```
+ruff format                   # Format all files in the current directory.
+ruff format --check           # Avoid writing any formatted files back; instead, exit with a non-zero status code if any files would have been modified, and zero otherwise
+ruff format --diff            # Avoid writing any formatted files back; instead, exit with a non-zero status code and the differencebetween the current file and how the formatted file would look like
+```

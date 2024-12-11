@@ -1,10 +1,13 @@
-from pyredis.protocol import parse_frame, SimpleString, Array, BulkString, Error
+from pyredis.protocol import parse_frame, SimpleString, BulkString, Error
 
 """
 Redis generally uses RESP as a request-response protocol in the following way:
 
-Clients send commands to a Redis server as an array of bulk strings. The first (and sometimes also the second) bulk string in the array is the command's name. Subsequent elements of the array are the arguments for the command.
-The server replies with a RESP type. The reply's type is determined by the command's implementation and possibly by the client's protocol version.
+Clients send commands to a Redis server as an array of bulk strings. The first (and 
+sometimes also the second) bulk string in the array is the command's name. Subsequent 
+elements of the array are the arguments for the command.
+The server replies with a RESP type. The reply's type is determined by the command's 
+implementation and possibly by the client's protocol version.
 """
 
 
@@ -16,7 +19,6 @@ def parse_command(buffer):
         return None, 0
 
     try:
-
         match value.data[0]:
             case BulkString("PING"):
                 return ping_command(value), size

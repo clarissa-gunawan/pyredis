@@ -15,7 +15,6 @@ def handle_connection(client_socket):
     remaining_message = b""
     try:
         while True:
-
             message = client_socket.recv(BUFFER_SIZE)
 
             if not message:
@@ -47,9 +46,7 @@ def server():
     # and SOCK_STREAM (TCP)
     print("Initializing Server")
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
-        server_socket.setsockopt(
-            socket.SOL_SOCKET, socket.SO_REUSEADDR, 1
-        )  # Reuse address
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Reuse address
         server_socket.bind((HOST, PORT))
         server_socket.listen()
 
@@ -60,7 +57,7 @@ def server():
                 print(f"Accepting connection from: {address}")
                 handle_connection(client_socket)
             except KeyboardInterrupt:
-                print(f"Shutting down server")
+                print("Shutting down server")
                 return
 
 

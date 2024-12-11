@@ -76,9 +76,7 @@ def parse_frame(buffer):
             size = end + DELIMITER_SIZE + expected_length + DELIMITER_SIZE
 
             if len(buffer) >= size:
-                value = buffer[
-                    end + DELIMITER_SIZE : end + DELIMITER_SIZE + expected_length
-                ].decode("ascii")
+                value = buffer[end + DELIMITER_SIZE : end + DELIMITER_SIZE + expected_length].decode("ascii")
                 return BulkString(value), size
 
         case "*":
