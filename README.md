@@ -35,3 +35,23 @@ echo -e '*1\r\n$4\r\nPING\r\n' | nc localhost 7
 echo -e '*2\r\n$4\r\nECHO\r\n$11\r\nHello World\r\n' | nc localhost 7
 echo -e '*1\r\n$4\r\nPING\r\n*1\r\n$4\r\nPING\r\n' | nc localhost 7
 ```
+
+
+## Using Redis CLI to Test
+
+Ensure that you have disabled redis-server
+
+Check if redis-server is NOT alive e.g.  `[ - ]  redis-server`
+```
+service --status-all | grep redis
+```
+
+Stop redis-server
+```
+service redis-server stop
+```
+
+Start redis-server
+```
+service redis-server start
+```

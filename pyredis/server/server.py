@@ -6,10 +6,9 @@ from pyredis.commands import parse_command
 
 # The Echo Protocol is formally defined in RFC862
 # https://datatracker.ietf.org/doc/html/rfc862/
-PORT = 7
+PORT = 6380 
 HOST = ""
 BUFFER_SIZE = 4096
-
 
 def handle_connection(client_socket):
     remaining_message = b""

@@ -8,8 +8,6 @@ Spec: https://redis.io/docs/latest/develop/reference/protocol-spec/
 - For **Integers** the first byte of the reply is ":"           ":[<+|->]<value>\r\n"
 - For **Bulk Strings** the first byte of the reply is "$"       "$<length>\r\n<data>\r\n"
 - For **Arrays** the first byte of the reply is "*"            "*<number-of-elements>\r\n<element-1>...<element-n>"
-- For Nulls "-"
-- For Empty Array 
 
 We need a module that extracts messages from the stream.
 When we read from the network we will get:
