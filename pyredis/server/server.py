@@ -57,9 +57,7 @@ def server():
             try:
                 client_socket, address = server_socket.accept()
                 print(f"Accepting connection from: {address}")
-                handle_connection(client_socket)
-                # t = Thread(target=handle_connection, args=(client_socket,), daemon=True)
-                # t.start()
+                Thread(target=handle_connection, args=(client_socket,), daemon=True).start()
             except KeyboardInterrupt:
                 print("Shutting down server")
                 return
