@@ -1,8 +1,15 @@
-name: Tests
+name: CI Pipeline
 
 on: [push, pull_request]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: psf/black@stable
+        with:
+          black_args: ". --check"
   unit-test:
     runs-on: ubuntu-latest
     steps:
@@ -20,3 +27,4 @@ jobs:
       - name: Test with pytest
         run: |
           python -m pytest tests/unit_tests
+  
