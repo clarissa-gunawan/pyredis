@@ -32,5 +32,5 @@ jobs:
           python -m pytest tests/unit_tests
       - name: Test integration tests/unit_tests
         run: |
-          apt install redis-tools
+          sudo apt install -y redis-tools
           python -m pytest tests/integration_tests
