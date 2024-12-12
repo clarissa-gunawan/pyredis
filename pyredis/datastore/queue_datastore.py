@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from queue import Queue
 from threading import Thread
-
+from .data import Data
 
 @dataclass
 class Task:
     key: str = None
-    value: str = None
+    value: Data = None
     response_queue: Queue = None
     response: str = None
 
@@ -16,6 +16,10 @@ class TaskProcessor(Thread):
         super().__init__(daemon=True)
         self._queue = Queue()
         self._data = dict()
+        self._keys_with_expiry = list()
+        # self._expiry = new dict(), or tuple, or datatype
+        # filter( if datatype.expiry <= timestamp)
+        # array of keys with expiries - random sample
 
     def process(self, task):
         self._queue.put(task)

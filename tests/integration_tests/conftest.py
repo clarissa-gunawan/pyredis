@@ -1,7 +1,7 @@
 import time
 import threading
 
-from pyredis.datastore import QueueDataStore
+from pyredis.datastore import QueueDataStore, Data
 
 import pytest
 
@@ -10,7 +10,7 @@ import pyredis
 
 def setup_datastore():
     ds = QueueDataStore()
-    ds.set("test_key", "test_value")
+    ds.set("test_key", Data(value="test_value"))
     return ds
 
 
