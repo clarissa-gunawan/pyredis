@@ -37,6 +37,8 @@ def parse_command(buffer, datastore=None):
                 return rpush_command(value, datastore), size
             case BulkString("LRANGE"):
                 return lrange_command(value, datastore), size
+            case BulkString("EXIST"):
+                return exist_command(value, datastore), size
             case _:
                 return Error("Error: Not a valid command").serialize(), size
     except Exception as e:
@@ -129,10 +131,9 @@ def lpush_command(input, datastore):
         elements = input.data[2:]
 
         if stored_data == "":
-            datastore.set(key, Data(value=elements))
-            stored_data = datastore.get(key)
+            datastore.set(key, Data(value=elements[::-1]))
         else:
-            datastore.set(key, Data(value=elements + stored_data.value))
+            datastore.set(key, Data(value=elements[::-1] + stored_data.value))
 
         new_len = len(datastore.get(key).value)
         return Integer(new_len).serialize()
@@ -174,12 +175,9 @@ def lrange_command(input, datastore):
         end = int(input.data[3].data)
 
         if stored_data == "":
-            print("empty array")
             return Array([]).serialize()
         else:
-            elements = list(map(lambda x: BulkString(x), stored_data.value[start : end + 1]))
-
-            return Array(elements).serialize()
-
+            elements = stored_data.value[start : end + 1] 
+            return Array(data=elements).serialize()
     except Exception as e:
         return Error(e).serialize()
