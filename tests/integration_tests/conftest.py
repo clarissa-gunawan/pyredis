@@ -1,6 +1,7 @@
 import time
 import threading
 
+from pyredis.datastore.lock_datastore import LockDataStore
 import pytest
 
 import pyredis
@@ -8,7 +9,9 @@ import pyredis
 
 @pytest.fixture(scope="session")
 def async_server():
-    threading.Thread(target=pyredis.main, kwargs={"threaded": False}, daemon=True).start()
+    ds = LockDataStore()
+    ds["test_key"] = "test_value"
+    threading.Thread(target=pyredis.main, kwargs={"threaded": False, "datastore": ds}, daemon=True).start()
     time.sleep(0.1)  # 100ms
     yield
 

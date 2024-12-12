@@ -8,6 +8,7 @@ import pytest
 from pyredis.commands import parse_command
 from pyredis.datastore.lock_datastore import LockDataStore
 
+
 @pytest.mark.parametrize(
     "buffer, expected",
     [

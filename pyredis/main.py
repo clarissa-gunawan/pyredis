@@ -19,7 +19,7 @@ async def async_main(host, port, datastore):
         await instance_of_server.serve_forever()
 
 
-def main(host: str = None, port: int = None, threaded: bool = False, locked: bool = True):
+def main(host: str = None, port: int = None, threaded: bool = False, locked: bool = True, datastore=None):
     if host is None:
         host = DEFAULT_HOST
     if port is None:
@@ -28,11 +28,11 @@ def main(host: str = None, port: int = None, threaded: bool = False, locked: boo
         port = int(port)
 
     print("Initialize DataStore")
-    datastore = None
-    if locked:
-        datastore = LockDataStore()
-    else:
-        datastore = QueueDataStore()
+    if datastore is None:
+        if locked:
+            datastore = LockDataStore()
+        else:
+            datastore = QueueDataStore()
 
     print(f"Start PyRedis on host: {host}, port: {port}")
 
