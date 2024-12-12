@@ -7,6 +7,7 @@ import pytest
 
 import pyredis
 
+
 def setup_datastore():
     ds = QueueDataStore()
     ds.set("test_key", "test_value")
@@ -18,6 +19,7 @@ def async_server():
     threading.Thread(target=pyredis.main, kwargs={"threaded": False, "datastore": setup_datastore()}, daemon=True).start()
     time.sleep(0.1)  # 100ms
     yield
+
 
 # TODO: Blocked by  OSError: [Errno 48] Address already in use
 # when running with the async server

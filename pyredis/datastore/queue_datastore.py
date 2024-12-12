@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from queue import Queue
 from threading import Thread
 
+
 @dataclass
 class Task:
     key: str = None
