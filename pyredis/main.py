@@ -17,7 +17,7 @@ async def async_main(host, port, datastore):
         await instance_of_server.serve_forever()
 
 
-def main(host: str = None, port: int = None, threaded: bool = False, locked: bool = True, datastore=None):
+def main(host: str = None, port: int = None, threaded: bool = False, locked: bool = False, datastore=None):
     if host is None:
         host = DEFAULT_HOST
     if port is None:
