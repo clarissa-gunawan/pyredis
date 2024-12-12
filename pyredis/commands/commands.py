@@ -177,7 +177,7 @@ def lrange_command(input, datastore):
         if stored_data == "":
             return Array([]).serialize()
         else:
-            elements = stored_data.value[start : end + 1] 
+            elements = stored_data.value[start : end + 1]
             return Array(data=elements).serialize()
     except Exception as e:
         return Error(e).serialize()
