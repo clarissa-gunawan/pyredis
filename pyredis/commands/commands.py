@@ -60,7 +60,7 @@ def set_command(input, datastore):
 
         key = input.data[1].data
         value = input.data[2].data
-        datastore[key] = value
+        datastore.set(key, value)
         return SimpleString("OK").serialize()
     except Exception as e:
         return Error(e).serialize()
@@ -72,7 +72,7 @@ def get_command(input, datastore):
             return Error("ERR wrong number of arguments for 'get' command").serialize()
 
         key = input.data[1].data
-        value = datastore[key]
+        value = datastore.get(key)
         return BulkString(value).serialize()
     except Exception:
         return Nil().serialize()

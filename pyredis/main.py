@@ -1,7 +1,6 @@
 import asyncio
-from pyredis.server.threaded_server import threaded_server
-from pyredis.server.async_server import PyRedisAsyncServerProtocol
-from pyredis.datastore import DataStore
+from pyredis.server import threaded_server, PyRedisAsyncServerProtocol
+from pyredis.datastore import LockDataStore, QueueDataStore
 
 DEFAULT_HOST = "localhost"
 DEFAULT_PORT = 6380
@@ -18,7 +17,7 @@ async def async_main(host, port, datastore):
         await instance_of_server.serve_forever()
 
 
-def main(host: str = None, port: int = None, threaded: bool = False):
+def main(host: str = None, port: int = None, threaded: bool = False, locked: bool = False, datastore=None):
     if host is None:
         host = DEFAULT_HOST
     if port is None:
@@ -26,8 +25,14 @@ def main(host: str = None, port: int = None, threaded: bool = False):
     else:
         port = int(port)
 
-    print("Initialize DataStore")
-    datastore = DataStore()
+    if datastore is None:
+        if locked:
+            print("Initialize LockedDataStore")
+            datastore = LockDataStore()
+        else:
+            print("Initialize QueueDataStore")
+            datastore = QueueDataStore()
+
     print(f"Start PyRedis on host: {host}, port: {port}")
 
     if threaded:
