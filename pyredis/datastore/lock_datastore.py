@@ -13,3 +13,11 @@ class LockDataStore:
     def __setitem__(self, key, value):
         with self._lock:
             self._data[key] = value
+
+    def get(self, key):
+        with self._lock:
+            return self._data[key]
+
+    def set(self, key, value):
+        with self._lock:
+            self._data[key] = value

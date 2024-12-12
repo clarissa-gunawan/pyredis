@@ -1,71 +1,61 @@
-# from queue import Queue
-# from threading import Thread
+from dataclasses import dataclass
+from queue import Queue
+from threading import Thread
 
-# @dataclass
-# class Task:
-#     command: str
-#     key: str
-#     value: str
-#     response_queue: Queue
-#     response: int = 0
+@dataclass
+class Task:
+    key: str = None
+    value: str = None
+    response_queue: Queue = None
+    response: str = None
 
 
-# class TaskProcessor(Thread):
-#     def __init__(self):
-#         super().__init__(daemon=True)
-#         self._queue = Queue()
+class TaskProcessor(Thread):
+    def __init__(self):
+        super().__init__(daemon=True)
+        self._queue = Queue()
+        self._data = dict()
 
-#     def process(self, task):
-#         self._queue.put(task)
+    def process(self, task):
+        self._queue.put(task)
 
-#     def run(self):
-#         while True:
-#             task = self._queue.get()
-#             if task is not None:
-#                 task.response = task.val * 2
-#                 task.response_queue.put(task)
+    def run(self):
+        while True:
+            try:
+                task = self._queue.get()
+                try:
+                    if task is not None:
+                        if task.key is not None and task.value is not None:
+                            self._data[task.key] = task.value
+                            task.response = "OK"
+                        elif task.key is not None and task.value is None:
+                            task.response = self._data[task.key]
+                        else:
+                            task.response = "ERR Task Processor: key is None"
+                except KeyError:
+                    task.response = ""
+                except Exception as e:
+                    task.response = f"ERR Task Processor: {e}"
+                finally:
+                    task.response_queue.put(task)
+            except KeyboardInterrupt:
+                break
 
 
 class QueueDataStore:
     def __init__(self):
-        pass
+        self.processor = TaskProcessor()
+        self.processor.start()
+        self.result_queue = Queue()
 
+    def get(self, key):
+        task = Task(key=key, response_queue=self.result_queue)
+        self.processor.process(task)
+        result = self.result_queue.get()
+        return result.response
 
-# class QueueDataStore(Thread):
-#     def __init__(self):
-#         super().__init__(daemon=True)
-#         self._queue = Queue()
-#         self._data = dict()
-
-#     def process(self, task):
-#         self._queue.put(task)
-
-
-#     def run(self):
-#         while True:
-#             task = self._queue.get()
-#             if task is not None:
-#                 if task.command == "SET":
-#                     self._data[task.key] = task.value
-#                     task.response = "OK"
-#                 else:
-#                     task.response = self._data[task.key]
-#                 task.response_queue.put(task)
-
-
-# if __name__ == "__main__":
-#     processor = TaskProcessor()
-#     processor.start()
-
-#     # client / user of the processor
-#     result_queue = Queue()
-
-#     while True:
-#         try:
-#             v = input("Enter a value> ")
-#             processor.process(Task(int(v), result_queue))
-#             result = result_queue.get()
-#             print(result.response)
-#         except KeyboardInterrupt:
-#             print()
-#             break
+    def set(self, key, value):
+        task = Task(key=key, value=value, response_queue=self.result_queue)
+        self.processor.process(task)
+        result = self.result_queue.get()
+        return result.response

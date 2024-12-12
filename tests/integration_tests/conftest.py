@@ -1,14 +1,15 @@
 import time
 import threading
 
-from pyredis.datastore.lock_datastore import LockDataStore
+from pyredis.datastore import QueueDataStore
+
 import pytest
 
 import pyredis
 
 def setup_datastore():
-    ds = LockDataStore()
-    ds["test_key"] = "test_value"
+    ds = QueueDataStore()
+    ds.set("test_key", "test_value")
     return ds
 
 
