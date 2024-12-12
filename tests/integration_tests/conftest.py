@@ -18,7 +18,8 @@ def async_server():
     time.sleep(0.1)  # 100ms
     yield
 
-
+# TODO: Blocked by  OSError: [Errno 48] Address already in use
+# when running with the async server
 # @pytest.fixture(scope="session")
 # def threaded_server():
 #     threading.Thread(target=pyredis.main, kwargs={"threaded": True, "datastore": setup_datastore()}, daemon=True).start()
