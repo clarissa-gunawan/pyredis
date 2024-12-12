@@ -30,4 +30,3 @@ class PyRedisAsyncServerProtocol(asyncio.Protocol):
 
             self.remaining_data = data[size:]
             data = self.remaining_data
-
