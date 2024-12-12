@@ -6,18 +6,21 @@ import pytest
 
 import pyredis
 
+def setup_datastore():
+    ds = LockDataStore()
+    ds["test_key"] = "test_value"
+    return ds
+
 
 @pytest.fixture(scope="session")
 def async_server():
-    ds = LockDataStore()
-    ds["test_key"] = "test_value"
-    threading.Thread(target=pyredis.main, kwargs={"threaded": False, "datastore": ds}, daemon=True).start()
+    threading.Thread(target=pyredis.main, kwargs={"threaded": False, "datastore": setup_datastore()}, daemon=True).start()
     time.sleep(0.1)  # 100ms
     yield
 
 
-@pytest.fixture(scope="session")
-def threaded_server():
-    threading.Thread(target=pyredis.main, kwargs={"port": 6382, "threaded": True}, daemon=True).start()
-    time.sleep(0.1)  # 100ms
-    yield
+# @pytest.fixture(scope="session")
+# def threaded_server():
+#     threading.Thread(target=pyredis.main, kwargs={"threaded": True, "datastore": setup_datastore()}, daemon=True).start()
+#     time.sleep(0.1)  # 100ms
+#     yield
