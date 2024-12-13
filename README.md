@@ -11,6 +11,18 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### Setup Dev Dependencies
+
+```
+pip install -r requirements-dev.txt
+```
+
+#### Install pre-commit
+```
+pre-commit install
+pre-commit run --all-files
+```
+
 ## Test
 ```
 pytest --capture=no --verbose
