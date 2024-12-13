@@ -13,7 +13,7 @@ implementation and possibly by the client's protocol version.
 """
 
 
-def parse_command(buffer, datastore=None):
+def parse_command(buffer, datastore=None, persistor=None):
     print(f"BUFFER: {buffer}")
     value, size = parse_frame(buffer)
     print(f"PARSED BUFFER: {value}")
@@ -27,18 +27,17 @@ def parse_command(buffer, datastore=None):
             case BulkString("ECHO"):
                 return echo_command(value), size
             case BulkString("SET"):
-                return set_command(value, datastore), size
+                return set_command(value, datastore, persistor), size
             case BulkString("GET"):
-                return get_command(value, datastore), size
+                return get_command(value, datastore, persistor), size
             case BulkString("LPUSH"):
-                print("LPUSH command trigger")
-                return lpush_command(value, datastore), size
+                return lpush_command(value, datastore, persistor), size
             case BulkString("RPUSH"):
-                return rpush_command(value, datastore), size
+                return rpush_command(value, datastore, persistor), size
             case BulkString("LRANGE"):
                 return lrange_command(value, datastore), size
             case BulkString("EXISTS"):
-                return exists_command(value, datastore), size
+                return exists_command(value, datastore, persistor), size
             case _:
                 return Error("Error: Not a valid command").serialize(), size
     except Exception as e:
@@ -64,7 +63,7 @@ def echo_command(input):
     return BulkString("").serialize()
 
 
-def set_command(input, datastore):
+def set_command(input, datastore, persistor):
     try:
         if len(input.data) < 3:
             return Error("ERR wrong number of arguments for 'set' command").serialize()
@@ -89,12 +88,15 @@ def set_command(input, datastore):
 
         stored_data = Data(value=value, expiry=expiry)
         datastore.set(key, stored_data)
+
+        if persistor is not None:
+            persistor.write_command(input.serialize())
         return SimpleString("OK").serialize()
     except Exception as e:
         return Error(e).serialize()
 
 
-def get_command(input, datastore):
+def get_command(input, datastore, persistor):
     try:
         if len(input.data) != 2:
             return Error("ERR wrong number of arguments for 'get' command").serialize()
@@ -102,17 +104,25 @@ def get_command(input, datastore):
         key = input.data[1].data
         stored_data = datastore.get(key)
         value = stored_data.value
+
+        if persistor is not None:
+            persistor.write_command(input.serialize())
+
         return BulkString(value).serialize()
     except Exception:
         return Nil().serialize()
 
 
-def exists_command(input, datastore):
+def exists_command(input, datastore, persistor):
     try:
         if len(input.data) != 2:
             return Error("ERR wrong number of arguments for 'exists' command").serialize()
         key = input.data[1].data
         stored_data = datastore.get(key)
+
+        if persistor is not None:
+            persistor.write_command(input.serialize())
+
         if stored_data == "":
             return Integer(0).serialize()
         else:
@@ -121,7 +131,7 @@ def exists_command(input, datastore):
         return Error(e).serialize()
 
 
-def lpush_command(input, datastore):
+def lpush_command(input, datastore, persistor):
     try:
         if len(input.data) < 2:
             return Error("ERR wrong number of arguments for 'lpush' command").serialize()
@@ -135,6 +145,9 @@ def lpush_command(input, datastore):
         else:
             datastore.set(key, Data(value=elements[::-1] + stored_data.value))
 
+        if persistor is not None:
+            persistor.write_command(input.serialize())
+
         new_len = len(datastore.get(key).value)
         return Integer(new_len).serialize()
 
@@ -142,7 +155,7 @@ def lpush_command(input, datastore):
         return Error(e).serialize()
 
 
-def rpush_command(input, datastore):
+def rpush_command(input, datastore, persistor):
     try:
         if len(input.data) < 2:
             return Error("ERR wrong number of arguments for 'rpush' command").serialize()
@@ -156,6 +169,9 @@ def rpush_command(input, datastore):
             stored_data = datastore.get(key)
         else:
             datastore.set(key, Data(value=stored_data.value + elements))
+
+        if persistor is not None:
+            persistor.write_command(input.serialize())
 
         new_len = len(datastore.get(key).value)
         return Integer(new_len).serialize()
