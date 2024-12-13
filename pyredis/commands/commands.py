@@ -38,6 +38,10 @@ def parse_command(buffer, datastore=None, persistor=None):
                 return lrange_command(value, datastore), size
             case BulkString("EXISTS"):
                 return exists_command(value, datastore, persistor), size
+            case BulkString("INCR"):
+                return increment_command(value, datastore, persistor), size
+            case BulkString("DECR"):
+                return decrement_command(value, datastore, persistor), size
             case _:
                 return Error("Error: Not a valid command").serialize(), size
     except Exception as e:
@@ -195,5 +199,57 @@ def lrange_command(input, datastore):
         else:
             elements = stored_data.value[start : end + 1]
             return Array(data=elements).serialize()
+    except Exception as e:
+        return Error(e).serialize()
+
+
+def increment_command(input, datastore, persistor):
+    try:
+        if len(input.data) != 2:
+            return Error("ERR wrong number of arguments for 'incr' command").serialize()
+
+        key = input.data[1].data
+        stored_data = datastore.get(key)
+
+        if persistor is not None:
+            persistor.write_command(input.serialize())
+
+        if stored_data == "":
+            datastore.set(key, Data(value=1))
+            value = datastore.get(key).value
+            return Integer(value).serialize()
+        else:
+            value = stored_data.value
+            if not isinstance(value, int):
+                return Error("ERR value is not an integer or out of range").serialize()
+            datastore.set(key, Data(value=value + 1))
+            new_value = datastore.get(key).value
+            return Integer(new_value).serialize()
+    except Exception as e:
+        return Error(e).serialize()
+
+
+def decrement_command(input, datastore, persistor):
+    try:
+        if len(input.data) != 2:
+            return Error("ERR wrong number of arguments for 'decr' command").serialize()
+
+        key = input.data[1].data
+        stored_data = datastore.get(key)
+
+        if persistor is not None:
+            persistor.write_command(input.serialize())
+
+        if stored_data == "":
+            datastore.set(key, Data(value=-1))
+            value = datastore.get(key).value
+            return Integer(value).serialize()
+        else:
+            value = stored_data.value
+            if not isinstance(value, int):
+                return Error("ERR value is not an integer or out of range").serialize()
+            datastore.set(key, Data(value=value - 1))
+            new_value = datastore.get(key).value
+            return Integer(new_value).serialize()
     except Exception as e:
         return Error(e).serialize()
