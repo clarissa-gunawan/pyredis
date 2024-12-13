@@ -1,12 +1,14 @@
 from dataclasses import dataclass
 from queue import Queue
 from threading import Thread
+from .data import Data
+import datetime
 
 
 @dataclass
 class Task:
     key: str = None
-    value: str = None
+    value: Data = None
     response_queue: Queue = None
     response: str = None
 
@@ -16,6 +18,10 @@ class TaskProcessor(Thread):
         super().__init__(daemon=True)
         self._queue = Queue()
         self._data = dict()
+        self._keys_with_expiry = list()
+        # self._expiry = new dict(), or tuple, or datatype
+        # filter( if datatype.expiry <= timestamp)
+        # array of keys with expiries - random sample
 
     def process(self, task):
         self._queue.put(task)
@@ -26,13 +32,19 @@ class TaskProcessor(Thread):
                 task = self._queue.get()
                 try:
                     if task is not None:
-                        if task.key is not None and task.value is not None:
-                            self._data[task.key] = task.value
-                            task.response = "OK"
-                        elif task.key is not None and task.value is None:
+                        if task.key is None:
+                            task.response = "ERR Task Processor: key is None"
+                            break
+
+                        self._check_expiry(task.key)
+
+                        if task.value is None:
                             task.response = self._data[task.key]
                         else:
-                            task.response = "ERR Task Processor: key is None"
+                            self._data[task.key] = task.value
+                            if task.value.expiry is not None:
+                                self._add_expiry(task.key)
+                            task.response = "OK"
                 except KeyError:
                     task.response = ""
                 except Exception as e:
@@ -41,6 +53,16 @@ class TaskProcessor(Thread):
                     task.response_queue.put(task)
             except KeyboardInterrupt:
                 break
+
+    def _check_expiry(self, key):
+        if key in self._keys_with_expiry:
+            expiry = self._data[key].expiry
+            if expiry is not None and expiry <= datetime.datetime.now():
+                del self._data[key]
+                self._keys_with_expiry.remove(key)
+
+    def _add_expiry(self, key):
+        self._keys_with_expiry.append(key)
 
 
 class QueueDataStore:

@@ -1,4 +1,6 @@
 from pyredis.protocol import parse_frame, SimpleString, BulkString, Error, Nil
+from pyredis.datastore import Data
+import datetime
 
 """
 Redis generally uses RESP as a request-response protocol in the following way:
@@ -55,12 +57,29 @@ def echo_command(input):
 
 def set_command(input, datastore):
     try:
-        if len(input.data) != 3:
+        if len(input.data) < 3:
             return Error("ERR wrong number of arguments for 'set' command").serialize()
 
         key = input.data[1].data
         value = input.data[2].data
-        datastore.set(key, value)
+        expiry = None
+
+        if len(input.data) > 3:
+            try:
+                arg_key = input.data[3].data
+                if arg_key == "EX":
+                    arg_value = int(input.data[4].data)
+                    expiry = datetime.datetime.now() + datetime.timedelta(seconds=arg_value)
+                elif arg_key == "PX":
+                    arg_value = int(input.data[4].data)
+                    expiry = datetime.datetime.now() + datetime.timedelta(milliseconds=arg_value)
+                else:
+                    return Error("ERR syntax error").serialize()
+            except KeyError:
+                return Error("ERR syntax error").serialize()
+
+        stored_data = Data(value=value, expiry=expiry)
+        datastore.set(key, stored_data)
         return SimpleString("OK").serialize()
     except Exception as e:
         return Error(e).serialize()
@@ -72,7 +91,8 @@ def get_command(input, datastore):
             return Error("ERR wrong number of arguments for 'get' command").serialize()
 
         key = input.data[1].data
-        value = datastore.get(key)
+        stored_data = datastore.get(key)
+        value = stored_data.value
         return BulkString(value).serialize()
     except Exception:
         return Nil().serialize()
