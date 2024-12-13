@@ -18,7 +18,9 @@ async def async_main(host, port, datastore, persistor):
         await instance_of_server.serve_forever()
 
 
-def main(host: str = None, port: int = None, threaded: bool = False, locked: bool = False, datastore=None, persistor=None):
+def main(
+    host: str = None, port: int = None, threaded: bool = False, locked: bool = False, persistance: bool = True, datastore=None
+):
     if host is None:
         host = DEFAULT_HOST
     if port is None:
@@ -34,9 +36,10 @@ def main(host: str = None, port: int = None, threaded: bool = False, locked: boo
             print("Initialize QueueDataStore")
             datastore = QueueDataStore()
 
-    if persistor is None:
+    persistor = None
+    if persistance:
         persistor = Persistor(datastore)
-    persistor.read()
+        persistor.read()
 
     print(f"Start PyRedis on host: {host}, port: {port}")
 

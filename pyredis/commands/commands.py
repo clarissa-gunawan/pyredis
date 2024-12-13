@@ -29,7 +29,7 @@ def parse_command(buffer, datastore=None, persistor=None):
             case BulkString("SET"):
                 return set_command(value, datastore, persistor), size
             case BulkString("GET"):
-                return get_command(value, datastore, persistor), size
+                return get_command(value, datastore), size
             case BulkString("LPUSH"):
                 return lpush_command(value, datastore, persistor), size
             case BulkString("RPUSH"):
@@ -42,6 +42,8 @@ def parse_command(buffer, datastore=None, persistor=None):
                 return increment_command(value, datastore, persistor), size
             case BulkString("DECR"):
                 return decrement_command(value, datastore, persistor), size
+            case BulkString("DEL"):
+                return delete_command(value, datastore, persistor), size
             case _:
                 return Error("Error: Not a valid command").serialize(), size
     except Exception as e:
@@ -100,18 +102,14 @@ def set_command(input, datastore, persistor):
         return Error(e).serialize()
 
 
-def get_command(input, datastore, persistor):
+def get_command(input, datastore):
     try:
         if len(input.data) != 2:
             return Error("ERR wrong number of arguments for 'get' command").serialize()
 
         key = input.data[1].data
         stored_data = datastore.get(key)
-        value = stored_data.value
-
-        if persistor is not None:
-            persistor.write_command(input.serialize())
-
+        value = str(stored_data.value)
         return BulkString(value).serialize()
     except Exception:
         return Nil().serialize()
@@ -215,16 +213,17 @@ def increment_command(input, datastore, persistor):
             persistor.write_command(input.serialize())
 
         if stored_data == "":
-            datastore.set(key, Data(value=1))
-            value = datastore.get(key).value
-            return Integer(value).serialize()
-        else:
-            value = stored_data.value
-            if not isinstance(value, int):
-                return Error("ERR value is not an integer or out of range").serialize()
-            datastore.set(key, Data(value=value + 1))
-            new_value = datastore.get(key).value
-            return Integer(new_value).serialize()
+            datastore.set(key, Data(value=0))
+            stored_data = datastore.get(key)
+
+        value = stored_data.value
+        if not isinstance(value, int):
+            return Error("ERR value is not an integer or out of range").serialize()
+
+        new_data = Data(value=value + 1)
+        datastore.set(key, new_data)
+        new_value = datastore.get(key).value
+        return Integer(new_value).serialize()
     except Exception as e:
         return Error(e).serialize()
 
@@ -241,15 +240,37 @@ def decrement_command(input, datastore, persistor):
             persistor.write_command(input.serialize())
 
         if stored_data == "":
-            datastore.set(key, Data(value=-1))
-            value = datastore.get(key).value
-            return Integer(value).serialize()
-        else:
-            value = stored_data.value
-            if not isinstance(value, int):
-                return Error("ERR value is not an integer or out of range").serialize()
-            datastore.set(key, Data(value=value - 1))
-            new_value = datastore.get(key).value
-            return Integer(new_value).serialize()
+            datastore.set(key, Data(value=0))
+            stored_data = datastore.get(key)
+
+        value = stored_data.value
+        if not isinstance(value, int):
+            return Error("ERR value is not an integer or out of range").serialize()
+
+        new_data = Data(value=value - 1)
+        datastore.set(key, new_data)
+        new_value = datastore.get(key).value
+        return Integer(new_value).serialize()
+    except Exception as e:
+        return Error(e).serialize()
+
+
+def delete_command(input, datastore, persistor):
+    try:
+        if len(input.data) < 2:
+            return Error("ERR wrong number of arguments for 'del' command").serialize()
+
+        count_successful_deletes = 0
+
+        for i in range(len(input.data)):
+            key = input.data[i].data
+            response = datastore.delete(key)
+            if response == "OK":
+                count_successful_deletes += 1
+
+        if persistor is not None:
+            persistor.write_command(input.serialize())
+
+        return Integer(count_successful_deletes).serialize()
     except Exception as e:
         return Error(e).serialize()

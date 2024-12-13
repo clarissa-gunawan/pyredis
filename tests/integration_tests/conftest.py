@@ -16,7 +16,9 @@ def setup_datastore():
 
 @pytest.fixture(scope="session")
 def async_server():
-    threading.Thread(target=pyredis.main, kwargs={"threaded": False, "datastore": setup_datastore()}, daemon=True).start()
+    threading.Thread(
+        target=pyredis.main, kwargs={"threaded": False, "persistance": False, "datastore": setup_datastore()}, daemon=True
+    ).start()
     time.sleep(0.1)  # 100ms
     yield
 
