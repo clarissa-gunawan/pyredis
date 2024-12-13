@@ -19,7 +19,13 @@ async def async_main(host, port, datastore, persistor):
 
 
 def main(
-    host: str = None, port: int = None, threaded: bool = False, locked: bool = False, persistance: bool = True, datastore=None
+    host: str = None,
+    port: int = None,
+    threaded: bool = False,
+    locked: bool = False,
+    persistance: bool = True,
+    datastore=None,
+    persistor_filename=None,
 ):
     if host is None:
         host = DEFAULT_HOST
@@ -38,7 +44,7 @@ def main(
 
     persistor = None
     if persistance:
-        persistor = Persistor(datastore)
+        persistor = Persistor(datastore, persistor_filename)
         persistor.read()
 
     print(f"Start PyRedis on host: {host}, port: {port}")

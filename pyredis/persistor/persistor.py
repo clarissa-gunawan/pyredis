@@ -7,18 +7,16 @@ from pyredis.protocol import Error
 
 
 class Persistor:
-    def __init__(self, datastore=None, filename=None):
-        self._filepath = self.initialize_file(filename)
+    def __init__(self, datastore=None, filepath=None):
+        self._filepath = self.initialize_file(filepath)
         self.processor = TaskFileProcessor(filepath=self._filepath, datastore=datastore)
         self.processor.start()
         self.result_queue = Queue()
 
-    def initialize_file(self, filename):
-        if filename is None:
-            filename = "data.aof"
-
-        directory_path = "tmp"
-        file_path = f"{directory_path}/{filename}"
+    def initialize_file(self, filepath):
+        if filepath is None:
+            filepath = "tmp/data.aof"
+        directory_path = "/".join(filepath.split("/")[:-1])
 
         # Create the directory
         try:
@@ -33,13 +31,13 @@ class Persistor:
 
         # Create the file
         try:
-            with open(file_path, "x") as file:
+            with open(filepath, "x") as file:
                 file.write("")
-            print(f"File {file_path} created successfully.")
+            print(f"File {filepath} created successfully.")
         except FileExistsError:
-            print(f"File {file_path} already exists.")
+            print(f"File {filepath} already exists.")
 
-        return file_path
+        return filepath
 
     def write_command(self, command):
         task = TaskFile(text=command, response_queue=self.result_queue)
