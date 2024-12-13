@@ -209,9 +209,6 @@ def increment_command(input, datastore, persistor):
         key = input.data[1].data
         stored_data = datastore.get(key)
 
-        if persistor is not None:
-            persistor.write_command(input.serialize())
-
         if stored_data == "":
             datastore.set(key, Data(value=0))
             stored_data = datastore.get(key)
@@ -223,6 +220,10 @@ def increment_command(input, datastore, persistor):
         new_data = Data(value=value + 1)
         datastore.set(key, new_data)
         new_value = datastore.get(key).value
+
+        if persistor is not None:
+            persistor.write_command(input.serialize())
+
         return Integer(new_value).serialize()
     except Exception as e:
         return Error(e).serialize()
@@ -236,9 +237,6 @@ def decrement_command(input, datastore, persistor):
         key = input.data[1].data
         stored_data = datastore.get(key)
 
-        if persistor is not None:
-            persistor.write_command(input.serialize())
-
         if stored_data == "":
             datastore.set(key, Data(value=0))
             stored_data = datastore.get(key)
@@ -250,6 +248,10 @@ def decrement_command(input, datastore, persistor):
         new_data = Data(value=value - 1)
         datastore.set(key, new_data)
         new_value = datastore.get(key).value
+
+        if persistor is not None:
+            persistor.write_command(input.serialize())
+
         return Integer(new_value).serialize()
     except Exception as e:
         return Error(e).serialize()
