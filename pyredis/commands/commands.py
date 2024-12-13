@@ -37,8 +37,8 @@ def parse_command(buffer, datastore=None):
                 return rpush_command(value, datastore), size
             case BulkString("LRANGE"):
                 return lrange_command(value, datastore), size
-            case BulkString("EXIST"):
-                return exist_command(value, datastore), size
+            case BulkString("EXISTS"):
+                return exists_command(value, datastore), size
             case _:
                 return Error("Error: Not a valid command").serialize(), size
     except Exception as e:
@@ -107,10 +107,10 @@ def get_command(input, datastore):
         return Nil().serialize()
 
 
-def exist_command(input, datastore):
+def exists_command(input, datastore):
     try:
         if len(input.data) != 2:
-            return Error("ERR wrong number of arguments for 'exist' command").serialize()
+            return Error("ERR wrong number of arguments for 'exists' command").serialize()
         key = input.data[1].data
         stored_data = datastore.get(key)
         if stored_data == "":
