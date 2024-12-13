@@ -26,7 +26,7 @@ class PyRedisAsyncServerProtocol(asyncio.Protocol):
             if processed_data is None:
                 break
 
-            print("Send: {!r}".format(data.decode()))
+            # print("Send: {!r}".format(data.decode()))
             self.transport.write(processed_data)
 
             self.remaining_data = data[size:]

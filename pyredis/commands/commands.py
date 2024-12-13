@@ -1,6 +1,7 @@
 from pyredis.protocol import parse_frame, SimpleString, BulkString, Error, Nil, Integer, Array
 from pyredis.datastore import Data
 import datetime
+from collections import deque
 
 """
 Redis generally uses RESP as a request-response protocol in the following way:
@@ -14,9 +15,9 @@ implementation and possibly by the client's protocol version.
 
 
 def parse_command(buffer, datastore=None, persistor=None):
-    print(f"BUFFER: {buffer}")
+    # print(f"BUFFER: {buffer}")
     value, size = parse_frame(buffer)
-    print(f"PARSED BUFFER: {value}")
+    # print(f"PARSED BUFFER: {value}")
     if value is None:
         return None, 0
 
@@ -141,11 +142,10 @@ def lpush_command(input, datastore, persistor):
         key = input.data[1].data
         stored_data = datastore.get(key)
         elements = input.data[2:]
-
         if stored_data == "":
-            datastore.set(key, Data(value=elements[::-1]))
+            datastore.set(key, Data(value=deque(elements[::-1])))
         else:
-            datastore.set(key, Data(value=elements[::-1] + stored_data.value))
+            stored_data.value.extendleft(elements)
 
         if persistor is not None:
             persistor.write_command(input.serialize())
@@ -167,10 +167,9 @@ def rpush_command(input, datastore, persistor):
         elements = input.data[2:]
 
         if stored_data == "":
-            datastore.set(key, Data(value=elements))
-            stored_data = datastore.get(key)
+            datastore.set(key, Data(value=deque(elements)))
         else:
-            datastore.set(key, Data(value=stored_data.value + elements))
+            stored_data.value.extend(elements)
 
         if persistor is not None:
             persistor.write_command(input.serialize())
@@ -195,7 +194,7 @@ def lrange_command(input, datastore):
         if stored_data == "":
             return Array([]).serialize()
         else:
-            elements = stored_data.value[start : end + 1]
+            elements = list(stored_data.value)[start : end + 1]
             return Array(data=elements).serialize()
     except Exception as e:
         return Error(e).serialize()

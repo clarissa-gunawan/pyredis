@@ -1,5 +1,5 @@
 import asyncio
-from pyredis.server import threaded_server, PyRedisAsyncServerProtocol
+from pyredis.server import ThreadedServer, PyRedisAsyncServerProtocol
 from pyredis.datastore import LockDataStore, QueueDataStore
 from pyredis.persistor import Persistor
 
@@ -25,7 +25,7 @@ def main(
     locked: bool = False,
     persistance: bool = True,
     datastore=None,
-    persistor_filename=None,
+    persistor_filepath=None,
 ):
     if host is None:
         host = DEFAULT_HOST
@@ -44,14 +44,15 @@ def main(
 
     persistor = None
     if persistance:
-        persistor = Persistor(datastore, persistor_filename)
+        persistor = Persistor(datastore, persistor_filepath)
         persistor.read()
 
     print(f"Start PyRedis on host: {host}, port: {port}")
 
     if threaded:
         print("Run Threaded Server")
-        threaded_server(host, port, datastore, persistor)
+        tserver = ThreadedServer(host, port, datastore, persistor)
+        tserver.threaded_server()
     else:
         print("Run Async Server")
         asyncio.run(async_main(host, port, datastore, persistor))

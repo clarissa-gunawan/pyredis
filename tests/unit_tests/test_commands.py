@@ -8,6 +8,7 @@ import pytest
 from pyredis.commands import parse_command
 from pyredis.datastore import QueueDataStore, Data
 from pyredis.protocol import BulkString
+from collections import deque
 
 
 @pytest.mark.parametrize(
@@ -62,10 +63,11 @@ from pyredis.protocol import BulkString
 def test_parse_command(buffer, expected):
     datastore = QueueDataStore()
     datastore.set("key1", Data(value="value1"))
-    datastore.set("list1", Data(value=[BulkString("listvalue1")]))
-    datastore.set("list2", Data(value=[BulkString("listvalue2")]))
+    datastore.set("list1", Data(value=deque([BulkString("listvalue1")])))
+    datastore.set("list2", Data(value=deque([BulkString("listvalue2")])))
     datastore.set(
-        "list3", Data(value=[BulkString(data="listvalue3"), BulkString(data="listvalue33"), BulkString(data="listvalue333")])
+        "list3",
+        Data(value=deque([BulkString(data="listvalue3"), BulkString(data="listvalue33"), BulkString(data="listvalue333")])),
     )
     got = parse_command(buffer, datastore)
     assert got == expected
