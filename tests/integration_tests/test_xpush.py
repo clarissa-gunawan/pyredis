@@ -2,7 +2,9 @@ import subprocess
 
 
 def test_lpush(async_server):
-    res = subprocess.run(["redis-cli", "-p", "6380", "LPUSH", "message_lpush", "first_msg", "second_msg"], stdout=subprocess.PIPE)
+    res = subprocess.run(
+        ["redis-cli", "-p", "6380", "LPUSH", "message_lpush", "first_msg", "second_msg"], stdout=subprocess.PIPE
+    )
     assert res.returncode == 0
     assert res.stdout.decode("utf-8").strip() == "2"
 
