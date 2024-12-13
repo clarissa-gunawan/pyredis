@@ -19,9 +19,6 @@ class TaskProcessor(Thread):
         self._queue = Queue()
         self._data = dict()
         self._keys_with_expiry = list()
-        # self._expiry = new dict(), or tuple, or datatype
-        # filter( if datatype.expiry <= timestamp)
-        # array of keys with expiries - random sample
 
     def process(self, task):
         self._queue.put(task)
