@@ -1,4 +1,4 @@
-from pyredis.protocol import parse_frame, SimpleString, BulkString, Error, Nil
+from pyredis.protocol import parse_frame, SimpleString, BulkString, Error, Nil, Integer, Array
 from pyredis.datastore import Data
 import datetime
 
@@ -30,6 +30,15 @@ def parse_command(buffer, datastore=None):
                 return set_command(value, datastore), size
             case BulkString("GET"):
                 return get_command(value, datastore), size
+            case BulkString("LPUSH"):
+                print("LPUSH command trigger")
+                return lpush_command(value, datastore), size
+            case BulkString("RPUSH"):
+                return rpush_command(value, datastore), size
+            case BulkString("LRANGE"):
+                return lrange_command(value, datastore), size
+            case BulkString("EXISTS"):
+                return exists_command(value, datastore), size
             case _:
                 return Error("Error: Not a valid command").serialize(), size
     except Exception as e:
@@ -96,3 +105,79 @@ def get_command(input, datastore):
         return BulkString(value).serialize()
     except Exception:
         return Nil().serialize()
+
+
+def exists_command(input, datastore):
+    try:
+        if len(input.data) != 2:
+            return Error("ERR wrong number of arguments for 'exists' command").serialize()
+        key = input.data[1].data
+        stored_data = datastore.get(key)
+        if stored_data == "":
+            return Integer(0).serialize()
+        else:
+            return Integer(1).serialize()
+    except Exception as e:
+        return Error(e).serialize()
+
+
+def lpush_command(input, datastore):
+    try:
+        if len(input.data) < 2:
+            return Error("ERR wrong number of arguments for 'lpush' command").serialize()
+
+        key = input.data[1].data
+        stored_data = datastore.get(key)
+        elements = input.data[2:]
+
+        if stored_data == "":
+            datastore.set(key, Data(value=elements[::-1]))
+        else:
+            datastore.set(key, Data(value=elements[::-1] + stored_data.value))
+
+        new_len = len(datastore.get(key).value)
+        return Integer(new_len).serialize()
+
+    except Exception as e:
+        return Error(e).serialize()
+
+
+def rpush_command(input, datastore):
+    try:
+        if len(input.data) < 2:
+            return Error("ERR wrong number of arguments for 'rpush' command").serialize()
+
+        key = input.data[1].data
+        stored_data = datastore.get(key)
+        elements = input.data[2:]
+
+        if stored_data == "":
+            datastore.set(key, Data(value=elements))
+            stored_data = datastore.get(key)
+        else:
+            datastore.set(key, Data(value=stored_data.value + elements))
+
+        new_len = len(datastore.get(key).value)
+        return Integer(new_len).serialize()
+
+    except Exception as e:
+        return Error(e).serialize()
+
+
+def lrange_command(input, datastore):
+    try:
+        if len(input.data) != 4:
+            return Error("ERR wrong number of arguments for 'lrange' command").serialize()
+
+        key = input.data[1].data
+        stored_data = datastore.get(key)
+        start = int(input.data[2].data)
+        end = int(input.data[3].data)
+
+        if stored_data == "":
+            return Array([]).serialize()
+        else:
+            elements = stored_data.value[start : end + 1]
+            return Array(data=elements).serialize()
+    except Exception as e:
+        return Error(e).serialize()

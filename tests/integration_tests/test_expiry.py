@@ -42,7 +42,7 @@ def test_set_get_after_expiry_miliseconds(async_server):
     )
     assert res.returncode == 0
     assert res.stdout.decode("utf-8").strip() == "OK"
-    time.sleep(0.1)  # 200ms
+    time.sleep(0.1)  # 100ms
     res = subprocess.run(["redis-cli", "-p", "6380", "GET", "msg_ms_after_expiry"], stdout=subprocess.PIPE)
     assert res.returncode == 0
     assert res.stdout.decode("utf-8").strip() == ""
