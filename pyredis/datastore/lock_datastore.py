@@ -21,3 +21,7 @@ class LockDataStore:
     def set(self, key, value):
         with self._lock:
             self._data[key] = value
+
+    def delete(self, key):
+        with self._lock:
+            del self._data[key]
