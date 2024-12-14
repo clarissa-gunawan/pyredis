@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from pyredis.server import ThreadedServer, PyRedisAsyncServerProtocol
 from pyredis.datastore import LockDataStore, QueueDataStore
 from pyredis.persistor import Persistor
@@ -27,6 +28,11 @@ def main(
     datastore=None,
     persistor_filepath=None,
 ):
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(
+        filename="/tmp/pyredis.log", format="%(asctime)s: %(levelname)s: %(name)s: %(message)s", level=logging.INFO
+    )
+
     if host is None:
         host = DEFAULT_HOST
     if port is None:
@@ -36,10 +42,10 @@ def main(
 
     if datastore is None:
         if locked:
-            print("Initialize LockedDataStore")
+            logger.info("Initialize LockedDataStore")
             datastore = LockDataStore()
         else:
-            print("Initialize QueueDataStore")
+            logger.info("Initialize QueueDataStore")
             datastore = QueueDataStore()
 
     persistor = None
@@ -47,14 +53,14 @@ def main(
         persistor = Persistor(datastore, persistor_filepath)
         persistor.read()
 
-    print(f"Start PyRedis on host: {host}, port: {port}")
+    logger.info(f"Start PyRedis on host: {host}, port: {port}")
 
     if threaded:
-        print("Run Threaded Server")
+        logger.info("Run Threaded Server")
         tserver = ThreadedServer(host, port, datastore, persistor)
         tserver.threaded_server()
     else:
-        print("Run Async Server")
+        logger.info("Run Async Server")
         asyncio.run(async_main(host, port, datastore, persistor))
 
     return 0

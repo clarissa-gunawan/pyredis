@@ -1,9 +1,11 @@
 import asyncio
+import logging
 from pyredis.commands import parse_command
 
 
 class PyRedisAsyncServerProtocol(asyncio.Protocol):
     def __init__(self, datastore, persistor):
+        self._logger = logging.getLogger(__name__)
         self.transport = None
         self.remaining_data = b""
         self.datastore = datastore
@@ -11,7 +13,7 @@ class PyRedisAsyncServerProtocol(asyncio.Protocol):
 
     def connection_made(self, transport):
         peername = transport.get_extra_info("peername")
-        print("Connection from {}".format(peername))
+        self._logger.info("Connection from {}".format(peername))
         self.transport = transport
 
     def data_received(self, data):
@@ -26,7 +28,7 @@ class PyRedisAsyncServerProtocol(asyncio.Protocol):
             if processed_data is None:
                 break
 
-            # print("Send: {!r}".format(data.decode()))
+            self._logger.info("Send: {!r}".format(data.decode()))
             self.transport.write(processed_data)
 
             self.remaining_data = data[size:]

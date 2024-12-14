@@ -72,3 +72,9 @@ ruff format                   # Format all files in the current directory.
 ruff format --check           # Avoid writing any formatted files back; instead, exit with a non-zero status code if any files would have been modified, and zero otherwise
 ruff format --diff            # Avoid writing any formatted files back; instead, exit with a non-zero status code and the differencebetween the current file and how the formatted file would look like
 ```
+
+## Logging
+See logs
+```
+ tail -f /tmp/pyredis.log
+```

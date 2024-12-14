@@ -1,6 +1,7 @@
+import logging
 import socket
-from pyredis.commands import parse_command
 from threading import Thread
+from pyredis.commands import parse_command
 
 # This is a Well Known Port assigned for Echo Protocol
 # https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers#Well-known_ports
@@ -13,6 +14,7 @@ BUFFER_SIZE = 4096
 
 class ThreadedServer:
     def __init__(self, host, port, datastore, persistor):
+        self._logger = logging.getLogger(__name__)
         self._host = host
         self._port = port
         self._datastore = datastore
@@ -43,7 +45,7 @@ class ThreadedServer:
                     message = remaining_message
 
         except ConnectionResetError:
-            print("Client disconnected")
+            self._logger.info("Client disconnected")
             return
         finally:
             client_socket.close()
@@ -57,15 +59,15 @@ class ThreadedServer:
             server_socket.listen()
 
             while self._is_running:
-                print("Waiting to accept a connection")
+                self._logger.info("Waiting to accept a connection")
                 try:
                     client_socket, address = server_socket.accept()
-                    print(f"Accepting connection from: {address}")
+                    self._logger.info(f"Accepting connection from: {address}")
                     Thread(
                         target=self.handle_connection, args=(client_socket, self._datastore, self._persistor), daemon=True
                     ).start()
                 except KeyboardInterrupt:
-                    print("Shutting down server")
+                    self._logger.info("Shutting down server")
                     return
 
     def shutdown_threaded_server(self):

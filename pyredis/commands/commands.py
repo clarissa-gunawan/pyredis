@@ -1,7 +1,8 @@
-from pyredis.protocol import parse_frame, SimpleString, BulkString, Error, Nil, Integer, Array
-from pyredis.datastore import Data
 import datetime
 from collections import deque
+import logging
+from pyredis.protocol import parse_frame, SimpleString, BulkString, Error, Nil, Integer, Array
+from pyredis.datastore import Data
 
 """
 Redis generally uses RESP as a request-response protocol in the following way:
@@ -15,9 +16,10 @@ implementation and possibly by the client's protocol version.
 
 
 def parse_command(buffer, datastore=None, persistor=None):
-    # print(f"BUFFER: {buffer}")
+    _logger = logging.getLogger(__name__)
+    _logger.debug(f"BUFFER: {buffer}")
     value, size = parse_frame(buffer)
-    # print(f"PARSED BUFFER: {value}")
+    _logger.debug(f"PARSED BUFFER: {value}")
     if value is None:
         return None, 0
 

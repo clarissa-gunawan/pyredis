@@ -1,6 +1,7 @@
+import os
+import logging
 from threading import Thread
 from queue import Queue
-import os
 from dataclasses import dataclass
 from pyredis.commands import parse_command
 from pyredis.protocol import Error
@@ -8,6 +9,7 @@ from pyredis.protocol import Error
 
 class Persistor:
     def __init__(self, datastore=None, filepath=None):
+        self._logger = logging.getLogger(__name__)
         self._filepath = self.initialize_file(filepath)
         self.processor = TaskFileProcessor(filepath=self._filepath, datastore=datastore)
         self.processor.start()
@@ -21,21 +23,21 @@ class Persistor:
         # Create the directory
         try:
             os.mkdir(directory_path)
-            print(f"Directory '{directory_path}' created successfully.")
+            self._logger.info(f"Directory '{directory_path}' created successfully.")
         except FileExistsError:
-            print(f"Directory '{directory_path}' already exists.")
+            self._logger.info(f"Directory '{directory_path}' already exists.")
         except PermissionError:
-            print(f"Permission denied: Unable to create '{directory_path}'.")
+            self._logger.info(f"Permission denied: Unable to create '{directory_path}'.")
         except Exception as e:
-            print(f"An error occurred: {e}")
+            self._logger.info(f"An error occurred: {e}")
 
         # Create the file
         try:
             with open(filepath, "x") as file:
                 file.write("")
-            print(f"File {filepath} created successfully.")
+            self._logger.info(f"File {filepath} created successfully.")
         except FileExistsError:
-            print(f"File {filepath} already exists.")
+            self._logger.info(f"File {filepath} already exists.")
 
         return filepath
 
