@@ -78,3 +78,19 @@ See logs
 ```
  tail -f /tmp/pyredis.log
 ```
+
+## Benchmark
+```
+# Profile Setup
+python3 -m cProfile -o /tmp/pyredis-out.pstats pyredis/__main__.py
+
+# Benchmark Examples
+redis-benchmark -t get,set -p 6380 -q
+redis-benchmark -t lrange -p 6380  -q
+
+# List outcome in the terminal 
+python scripts/read_pstats.py /tmp/pyredis-out.pstats
+
+# Visualize outcome on a webpage
+snakeviz /tmp/pyredis-out.pstats
+```
