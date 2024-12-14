@@ -85,8 +85,8 @@ See logs
 python3 -m cProfile -o /tmp/pyredis-out.pstats pyredis/__main__.py
 
 # Benchmark Examples
-redis-benchmark -t get,set -p 6380 -q
-redis-benchmark -t lrange -p 6380  -q
+redis-benchmark -p 6380 -t get,set -n 1000 -q
+redis-benchmark -p 6380 -t lrange -n 1000 -q
 
 # List outcome in the terminal 
 python scripts/read_pstats.py /tmp/pyredis-out.pstats
