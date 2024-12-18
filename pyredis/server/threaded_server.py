@@ -54,7 +54,8 @@ class ThreadedServer:
         # the family and type default to AF_INET (Internet Addresses - Hostname or IP address)
         # and SOCK_STREAM (TCP)
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
-            server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Reuse address
+            # Avoid bind() exception: OSError: [Errno 48] Address already in use
+            server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             server_socket.bind((self._host, self._port))
             server_socket.listen()
 
