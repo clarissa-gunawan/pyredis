@@ -13,9 +13,9 @@ def test_persistence():
     assert not os.path.exists(test_filepath)
 
     redis_process = subprocess.Popen(
-        ["python", "-m", "pyredis", "--port", port, "--persistence", "--persistor-filepath", test_filepath]
+        ["python", "-m", "pyredis", "--port", port, "--persistence", "--persistor-filepath", test_filepath, "--log", "DEBUG"]
     )
-    time.sleep(0.2)  # Allow some time for the server to start
+    time.sleep(0.5)  # Allow some time for the server to start
 
     assert os.path.exists(test_filepath)
 
@@ -30,9 +30,9 @@ def test_persistence():
     redis_process.terminate()
 
     redis_process = subprocess.Popen(
-        ["python", "-m", "pyredis", "--port", port, "--persistence", "--persistor-filepath", test_filepath]
+        ["python", "-m", "pyredis", "--port", port, "--persistence", "--persistor-filepath", test_filepath, "--log", "DEBUG"]
     )
-    time.sleep(0.2)  # Allow some time for the server to start
+    time.sleep(0.5)  # Allow some time for the server to start
 
     res = subprocess.run(["redis-cli", "-p", port, "GET", "message_persistence"], stdout=subprocess.PIPE)
     assert res.returncode == 0
