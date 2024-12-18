@@ -72,3 +72,25 @@ ruff format                   # Format all files in the current directory.
 ruff format --check           # Avoid writing any formatted files back; instead, exit with a non-zero status code if any files would have been modified, and zero otherwise
 ruff format --diff            # Avoid writing any formatted files back; instead, exit with a non-zero status code and the differencebetween the current file and how the formatted file would look like
 ```
+
+## Logging
+See logs
+```
+ tail -f /tmp/pyredis.log
+```
+
+## Benchmark
+```
+# Profile Setup
+python3 -m cProfile -o /tmp/pyredis-out.pstats pyredis/__main__.py
+
+# Benchmark Examples
+redis-benchmark -p 6380 -t get,set -n 1000 -q
+redis-benchmark -p 6380 -t lrange -n 1000 -q
+
+# List outcome in the terminal 
+python scripts/read_pstats.py /tmp/pyredis-out.pstats
+
+# Visualize outcome on a webpage
+snakeviz /tmp/pyredis-out.pstats
+```

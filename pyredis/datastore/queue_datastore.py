@@ -7,6 +7,7 @@ import datetime
 
 @dataclass
 class Task:
+    command: str = None
     key: str = None
     value: Data = None
     response_queue: Queue = None
@@ -36,7 +37,13 @@ class TaskProcessor(Thread):
                         self._check_expiry(task.key)
 
                         if task.value is None:
-                            task.response = self._data[task.key]
+                            if task.command == "GET":
+                                task.response = self._data[task.key]
+                            if task.command == "DEL":
+                                if task.key in self._keys_with_expiry:
+                                    self._keys_with_expiry.remove(task.key)
+                                del self._data[task.key]
+                                task.response = "OK"
                         else:
                             self._data[task.key] = task.value
                             if task.value.expiry is not None:
@@ -69,13 +76,19 @@ class QueueDataStore:
         self.result_queue = Queue()
 
     def get(self, key):
-        task = Task(key=key, response_queue=self.result_queue)
+        task = Task(command="GET", key=key, response_queue=self.result_queue)
         self.processor.process(task)
         result = self.result_queue.get()
         return result.response
 
     def set(self, key, value):
-        task = Task(key=key, value=value, response_queue=self.result_queue)
+        task = Task(command="SET", key=key, value=value, response_queue=self.result_queue)
+        self.processor.process(task)
+        result = self.result_queue.get()
+        return result.response
+
+    def delete(self, key):
+        task = Task(command="DEL", key=key, response_queue=self.result_queue)
         self.processor.process(task)
         result = self.result_queue.get()
         return result.response
