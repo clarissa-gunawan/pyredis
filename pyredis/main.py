@@ -54,7 +54,6 @@ def main(
             datastore = QueueDataStore()
 
     persistor = None
-    logger.error(f"PERISTANCE IS: {persistance}")
     if persistance:
         persistor = Persistor(datastore, persistor_filepath)
         persistor.read()
