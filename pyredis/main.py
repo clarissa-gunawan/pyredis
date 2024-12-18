@@ -1,23 +1,12 @@
 import asyncio
 import typer
 import logging
-from pyredis.server import ThreadedServer, PyRedisAsyncServerProtocol
+from pyredis.server import ThreadedServer, AsyncServer
 from pyredis.datastore import LockDataStore, QueueDataStore
 from pyredis.persistor import Persistor
 
 DEFAULT_HOST = "localhost"
 DEFAULT_PORT = 6380
-
-
-async def async_main(host, port, datastore, persistor):
-    loop = asyncio.get_running_loop()
-    instance_of_server = await loop.create_server(
-        lambda: PyRedisAsyncServerProtocol(datastore, persistor),
-        host,
-        port,
-    )
-    async with instance_of_server:
-        await instance_of_server.serve_forever()
 
 
 def configure_logging(log="WARNING", verbose=False, quiet=False):
@@ -70,13 +59,17 @@ def main(
         persistor.read()
 
     logger.info(f"Start PyRedis on host: {host}, port: {port}")
+    server = None
 
     if threaded:
         logger.info("Run Threaded Server")
         tserver = ThreadedServer(host, port, datastore, persistor)
-        tserver.threaded_server()
+        tserver.start()
+        server = tserver
     else:
         logger.info("Run Async Server")
-        asyncio.run(async_main(host, port, datastore, persistor))
+        aserver = AsyncServer(host, port, datastore, persistor)
+        asyncio.run(aserver.start())
+        server = aserver
 
-    return 0
+    return server

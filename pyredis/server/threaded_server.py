@@ -50,7 +50,7 @@ class ThreadedServer:
         finally:
             client_socket.close()
 
-    def threaded_server(self):
+    def start(self):
         # the family and type default to AF_INET (Internet Addresses - Hostname or IP address)
         # and SOCK_STREAM (TCP)
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
@@ -71,7 +71,7 @@ class ThreadedServer:
                     self._logger.info("Shutting down server")
                     return
 
-    def shutdown_threaded_server(self):
+    def stop(self):
         self._is_running = False
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             client_socket.connect(self._host, self._port)
