@@ -28,7 +28,7 @@ def main(
     port: int = None,
     threaded: bool = False,
     locked: bool = False,
-    persistance: bool = False,
+    persistence: bool = False,
     datastore=None,
     persistor_filepath=None,
     log: str = typer.Option("WARNING", "--log", "-l"),
@@ -54,7 +54,7 @@ def main(
             datastore = QueueDataStore()
 
     persistor = None
-    if persistance:
+    if persistence:
         persistor = Persistor(datastore, persistor_filepath)
         persistor.read()
 
