@@ -18,7 +18,11 @@ def configure_logging(log="WARNING", verbose=False, quiet=False):
     else:
         log_level = getattr(logging, log.upper(), logging.WARNING)  # Set logging level based on --log argument
 
-    logging.basicConfig(format="%(asctime)s: %(levelname)s: %(name)s: %(message)s", level=log_level)
+    logging.basicConfig(
+        format="%(asctime)s: %(levelname)s: %(name)s: %(message)s",
+        level=log_level,
+        handlers=[logging.FileHandler("/tmp/pyredis.log"), logging.StreamHandler()],
+    )
 
 
 def main(
