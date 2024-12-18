@@ -2,6 +2,10 @@ import subprocess
 
 
 def test_exists_exists(async_server):
+    res = subprocess.run(["redis-cli", "-p", "6380", "SET", "test_key", "teset_value"], stdout=subprocess.PIPE)
+    assert res.returncode == 0
+    assert res.stdout.decode("utf-8").strip() == "OK"
+
     res = subprocess.run(["redis-cli", "-p", "6380", "EXISTS", "test_key"], stdout=subprocess.PIPE)
     assert res.returncode == 0
     assert res.stdout.decode("utf-8").strip() == "1"

@@ -2,6 +2,10 @@ import subprocess
 
 
 def test_get(async_server):
+    res = subprocess.run(["redis-cli", "-p", "6380", "SET", "test_key", "test_value"], stdout=subprocess.PIPE)
+    assert res.returncode == 0
+    assert res.stdout.decode("utf-8").strip() == "OK"
+
     res = subprocess.run(["redis-cli", "-p", "6380", "GET", "test_key"], stdout=subprocess.PIPE)
     assert res.returncode == 0
     assert res.stdout.decode("utf-8").strip() == "test_value"
