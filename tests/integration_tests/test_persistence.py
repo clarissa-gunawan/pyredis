@@ -4,7 +4,7 @@ import time
 
 
 def test_persistence():
-    test_filepath = f"{os.path.abspath(os.getcwd())}/tmp/test/persistence_test.aof"
+    test_filepath = "/tmp/test/persistence_test.aof"
     port = str(6381)
 
     if os.path.exists(test_filepath):
