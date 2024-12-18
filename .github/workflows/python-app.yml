@@ -29,8 +29,8 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Unit Test with pytest
         run: |
-          python -m pytest tests/unit_tests
+          python -m pytest tests/unit_tests -vs
       - name: Integration Test with pytest
         run: |
           sudo apt install -y redis-tools
-          python -m pytest tests/integration_tests
+          python -m pytest tests/integration_tests -vs

@@ -27,9 +27,9 @@ class Persistor:
         except FileExistsError:
             self._logger.info(f"Directory '{directory_path}' already exists.")
         except PermissionError:
-            self._logger.info(f"Permission denied: Unable to create '{directory_path}'.")
+            self._logger.error(f"Permission denied: Unable to create '{directory_path}'.")
         except Exception as e:
-            self._logger.info(f"An error occurred: {e}")
+            self._logger.error(f"An error occurred: {e}")
 
         # Create the file
         try:
